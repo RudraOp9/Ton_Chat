@@ -43,7 +43,7 @@ class NewWalletViewModel(
 
     fun canContinue() {
         if (isCopied.value) {
-            // create account n goto home screen
+            // todo create account n goto home screen
 
 
         } else {

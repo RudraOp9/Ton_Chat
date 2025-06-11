@@ -11,9 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.AlertDialog
@@ -80,6 +78,8 @@ fun NewWalletScreen() {
             }
 
 
+
+
             DefaultScreen(
                 screenName = "New Wallet", onBack = {
 
@@ -105,8 +105,8 @@ fun NewWalletScreen() {
                     )
                 },
                 postLazyContent = {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
+                    /*Column(
+                        modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         LazyVerticalGrid(
@@ -120,7 +120,7 @@ fun NewWalletScreen() {
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = if ((it + 1) % 2 == 0) Arrangement.Start else Arrangement.End
                                 ) {
-                                    Row(modifier = Modifier) {
+                                    Row(modifier = Modifier.wrapContentWidth()) {
                                         Text(
                                             text = "${it + 1}.",
                                             modifier = Modifier.width(24.dp),
@@ -132,7 +132,7 @@ fun NewWalletScreen() {
                                         SelectionContainer {
                                             Text(
                                                 text = vm.secretKeys.value[it],
-                                                modifier = Modifier.widthIn(min = 100.dp),
+                                                modifier = Modifier.padding(end = 50.dp),
                                                 style = MaterialTheme.typography.bodyMedium,
                                                 color = MaterialTheme.colorScheme.onSurface,
                                                 fontWeight = FontWeight.SemiBold
@@ -163,6 +163,7 @@ fun NewWalletScreen() {
                         }
                     }
 
+                }*/
                 }
             ) {
                 item {
@@ -188,34 +189,69 @@ fun NewWalletScreen() {
                         SelectionContainer {
                             Text(
                                 text = vm.userFriendlyAddress.value,
-                                style = MaterialTheme.typography.headlineSmall,
+                                style = MaterialTheme.typography.titleMedium,
                                 textAlign = TextAlign.Center,
                                 color = MaterialTheme.colorScheme.onSurface,
+                                maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.width(200.dp).padding(bottom = 24.dp)
+                                modifier = Modifier.padding(bottom = 24.dp)
                             )
                         }
                     }
                 }
-                /* items() {
-
-                     Box(
-                         modifier = Modifier.fillMaxWidth(),
-                         contentAlignment = Alignment.Center,
-                     ) {
-
-                         Spacer(modifier = Modifier.padding(start = 50.dp))
-                         SelectionContainer {
-                             Text(
-                                 text = "${it + 13}. ${vm.secretKeys.value[it + 12]}",
-                                 style = MaterialTheme.typography.bodyMedium,
-                                 color = MaterialTheme.colorScheme.onSurface,
-                                 textAlign = TextAlign.End,
-                             )
-                         }
-
-                     }
-                 }*/
+                items(vm.secretKeys.value.size) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(0.5f).wrapContentWidth(),
+                            horizontalArrangement = Arrangement.Start
+                        ) {
+                            Text(
+                                text = "${it + 1}.",
+                                modifier = Modifier.width(24.dp),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                                textAlign = TextAlign.End,
+                            )
+                            Spacer(Modifier.padding(start = 8.dp))
+                            SelectionContainer {
+                                Text(
+                                    text = vm.secretKeys.value[it],
+                                    modifier = Modifier.width(100.dp),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
+                        }
+                    }
+                }
+                item {
+                    Spacer(modifier = Modifier.padding(bottom = 100.dp))
+                }
+            }
+            Box(
+                modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)
+                    .navigationBarsPadding(),
+                contentAlignment = Alignment.BottomCenter
+            ) {
+                Button(
+                    onClick = {
+                        vm.canContinue()
+                    },
+                    modifier = Modifier.fillMaxWidth() ,
+                    shape = RoundedCornerShape(40)
+                ) {
+                    Text(
+                        text = "Continue",
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
             }
 
         }
