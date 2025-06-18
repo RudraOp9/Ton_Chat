@@ -54,20 +54,22 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
 
             implementation(project.dependencies.platform(libs.koin.bom))
-            api(libs.koin.core)
+            implementation(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.koin.compose.viewmodel.navigation)
 
             implementation(compose.materialIconsExtended)
 
-            implementation(libs.ton.kotlin)
+           // implementation("org.ton:ton-kotlin:0.2.18")
             implementation(libs.bundles.ktor)
+            implementation("org.ton:ton-kotlin-crypto:0.4.3")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
-            implementation(libs.ton.kotlin)
-            implementation(libs.bundles.ktor)
+            implementation("org.ton:ton-kotlin-crypto:0.4.3")
+           implementation("org.ton:ton-kotlin-contract:0.4.3")
+           // implementation(libs.bundles.ktor)
         }
         nativeMain.dependencies{
             implementation(libs.ktor.client.darwin)
@@ -79,6 +81,11 @@ kotlin {
         }
     }
 }
+/*configurations.all {
+    resolutionStrategy.force("io.ktor:ktor-client-core:YOUR_CHOSEN_VERSION")
+    resolutionStrategy.force("io.ktor:ktor-client-serialization:YOUR_CHOSEN_VERSION")
+    // Add for all Ktor modules you use or ton-kotlin might use
+}*/
 
 android {
     namespace = "leo.decentralized.tonchat"

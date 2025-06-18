@@ -18,6 +18,7 @@ kotlinx-coroutines = "1.10.2"
 
 koin-bom = "4.0.3"
 ktor = "3.1.3"
+ktorUtil = "2.3.7"
 lifecycleViewmodel = "2.8.7"
 tonKotlin = "0.4.3"
 
@@ -54,7 +55,9 @@ ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "kto
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktor-utils = { module = "io.ktor:ktor-utils", version.ref = "ktorUtil" }
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
+
 
 
 [plugins]
@@ -72,5 +75,5 @@ ktor = [
     "ktor-client-core",
     "ktor-client-content-negotiation",
     "ktor-serialization-kotlinx-json",
-    "ktor-client-logging"
+    "ktor-client-logging",
 ]

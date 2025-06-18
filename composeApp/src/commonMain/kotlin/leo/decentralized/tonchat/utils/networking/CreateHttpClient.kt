@@ -7,8 +7,6 @@ import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
-import org.koin.core.logger.Level
-import org.ton.logger.Logger
 
 
 fun createHttpClient(engine: HttpClientEngine):HttpClient{
