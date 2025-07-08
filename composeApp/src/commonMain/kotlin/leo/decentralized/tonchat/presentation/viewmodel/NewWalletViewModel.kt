@@ -8,10 +8,15 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
+import leo.decentralized.tonchat.data.repositories.security.SecureStorageRepository
 import leo.decentralized.tonchat.domain.usecase.TonWalletUseCase
+import leo.decentralized.tonchat.domain.usecase.UserUseCase
 
+@OptIn(ExperimentalStdlibApi::class)
 class NewWalletViewModel(
-    private val tonWalletUseCase: TonWalletUseCase
+    private val tonWalletUseCase: TonWalletUseCase,
+    private val userUseCase: UserUseCase,
+    val secureStorageRepository : SecureStorageRepository
 ) : ViewModel() {
     val isLoadingText = mutableStateOf("")
     val isLoading = mutableStateOf(false)
@@ -20,6 +25,8 @@ class NewWalletViewModel(
     val showBackupAlert = mutableStateOf(false)
     val secretKeys = mutableStateOf(List(24) { "" })
     val userFriendlyAddress = mutableStateOf("")
+    lateinit var privateKey: ByteArray
+    var publicKey = ""
 
     init {
         isLoading.value = true
@@ -29,7 +36,12 @@ class NewWalletViewModel(
                 secretKeys.value = seedPhrases
                 val result = tonWalletUseCase.generateWallet(secretKeys.value)
                 if (result.success) {
+                    privateKey = result.result?.privateKey ?: ByteArray(1)
+                    publicKey = result.result?.publicKeyHex.toString()
                     userFriendlyAddress.value = result.result?.userFriendlyAddress.toString()
+                    secureStorageRepository.storeUserFriendlyAddress(userFriendlyAddress.value)
+                    secureStorageRepository.storePublicKey(publicKey.hexToByteArray())
+                    secureStorageRepository.storePrivateKey(privateKey)
                 } else {
                     snackBarText.value = result.error?.message.toString()
                 }
@@ -43,9 +55,38 @@ class NewWalletViewModel(
 
     fun canContinue() {
         if (isCopied.value) {
-            // todo create account n goto home screen
-
-
+            isLoadingText.value = "Initiating account..."
+            isLoading.value = true
+            val signedMsg = tonWalletUseCase.signMessage(privateKey, userFriendlyAddress.value)
+            viewModelScope.launch(Dispatchers.IO) {
+                if (signedMsg.success) {
+                    val result = tonWalletUseCase.generateNewToken(
+                        publicKey,
+                        userFriendlyAddress.value,
+                        signedMsg.result.toString()
+                    )
+                    if (result.success) {
+                        println("token " + result.result)
+                        result.result?.let {
+                            secureStorageRepository.storeToken(token = it).onSuccess {
+                                initAccount()
+                                isLoading.value = false
+                                snackBarText.value = "Account created successfully"
+                            }.onFailure {it->
+                                snackBarText.value = it.message.toString()
+                                isLoading.value = false
+                                isLoadingText.value = ""
+                            }
+                        }
+                    } else {
+                        isLoading.value = true
+                        snackBarText.value = signedMsg.error?.message?:""
+                    }
+                } else {
+                    isLoading.value = true
+                    snackBarText.value = signedMsg.error?.message?:""
+                }
+            }
         } else {
             showBackupAlert.value = true
         }
@@ -58,8 +99,12 @@ class NewWalletViewModel(
         }
     }
 
-    fun initAccount() {
-        isLoading.value = true
-
+    suspend fun initAccount() {
+        val result = userUseCase.createNewUser()
+        if(!result.success){
+            snackBarText.value = result.error?.message?:"Unknown error"
+        }
+        isLoading.value = false
+        isLoadingText.value = ""
     }
 }

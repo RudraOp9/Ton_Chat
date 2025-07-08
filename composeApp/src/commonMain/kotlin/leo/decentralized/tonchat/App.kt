@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import leo.decentralized.tonchat.di.appModule
+import leo.decentralized.tonchat.navigation.NavHost
 import leo.decentralized.tonchat.presentation.screens.ImportWalletScreen
 import leo.decentralized.tonchat.presentation.screens.NewWalletScreen
 import leo.decentralized.tonchat.presentation.theme.TonDecentralizedChatTheme
@@ -26,23 +27,19 @@ import ton_decentralized_chat.composeapp.generated.resources.compose_multiplatfo
 @Composable
 @Preview
 fun App(koinAppDeclaration: KoinAppDeclaration? = null) {
-
     KoinApplication(
         application = {
             koinAppDeclaration?.invoke(this)
             modules(appModule)
         }
     ) {
-
-
         TonDecentralizedChatTheme {
             Column(
                 modifier = Modifier
                     .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                //ImportWalletScreen()
-                NewWalletScreen()
+                NavHost()
             }
         }
     }

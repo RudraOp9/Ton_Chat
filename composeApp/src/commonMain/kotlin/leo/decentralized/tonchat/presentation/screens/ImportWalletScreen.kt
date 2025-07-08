@@ -42,11 +42,14 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import leo.decentralized.tonchat.presentation.viewmodel.ImportWalletViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun ImportWalletScreen() {
+fun ImportWalletScreen(
+    navController: NavController
+) {
     val vm: ImportWalletViewModel = koinViewModel()
     val focusManager = LocalFocusManager.current
     val clipboard: ClipboardManager = LocalClipboardManager.current
@@ -64,7 +67,7 @@ fun ImportWalletScreen() {
         snackbarHostState = snackBarHost
     ) {
         DefaultScreen(screenName = "Import Wallet", onBack = {
-
+            navController.popBackStack()
         }, secondaryButton = {
 
             Text(
@@ -73,7 +76,7 @@ fun ImportWalletScreen() {
                 color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.titleSmall,
                 modifier = Modifier
-                    .padding(vertical = 8.dp)
+                    .padding(/*vertical = 8.dp*/)
                     .clickable(
                         interactionSource = null,
                         indication = ripple(color = MaterialTheme.colorScheme.primary),

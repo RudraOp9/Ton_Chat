@@ -1,0 +1,3 @@
+package leo.decentralized.tonchat.data.repositories.security
+
+expect fun securePrivateExecutionAndStorageRepositoryImpl():SecurePrivateExecutionAndStorageRepository

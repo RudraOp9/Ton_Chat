@@ -1,9 +1,19 @@
 package leo.decentralized.tonchat.di
 
-import leo.decentralized.tonchat.data.repositories.TonChatApiRepositoryImpl
+import leo.decentralized.tonchat.data.dataModels.Password
+import leo.decentralized.tonchat.data.repositories.security.SecureStorageRepositoryImpl
+import leo.decentralized.tonchat.data.repositories.security.SecureStorageRepository
+import leo.decentralized.tonchat.data.repositories.network.tonChatApi.TonChatApiRepositoryImpl
+import leo.decentralized.tonchat.data.repositories.network.userApi.UserApiRepository
+import leo.decentralized.tonchat.data.repositories.network.userApi.UserApiRepositoryImpl
+import leo.decentralized.tonchat.data.repositories.getSettings
+import leo.decentralized.tonchat.data.repositories.security.SecurePrivateExecutionAndStorageRepository
+import leo.decentralized.tonchat.data.repositories.security.securePrivateExecutionAndStorageRepositoryImpl
 import leo.decentralized.tonchat.domain.usecase.FormatStringUseCase
 import leo.decentralized.tonchat.domain.usecase.TonWalletUseCase
+import leo.decentralized.tonchat.domain.usecase.UserUseCase
 import leo.decentralized.tonchat.presentation.viewmodel.ImportWalletViewModel
+import leo.decentralized.tonchat.presentation.viewmodel.InputPasswordViewModel
 import leo.decentralized.tonchat.presentation.viewmodel.NewWalletViewModel
 import leo.decentralized.tonchat.utils.networking.createHttpClient
 import leo.decentralized.tonchat.utils.networking.httpClientEngine
@@ -12,18 +22,26 @@ import org.koin.dsl.module
 
 val commonModule = module {
 
-
     //view models
-    viewModel { ImportWalletViewModel(get(), get()) }
-    viewModel { NewWalletViewModel(get()) }
+    viewModel { ImportWalletViewModel(get(), get(),get()) }
+    viewModel { NewWalletViewModel(get(),get(),get()) }
+    viewModel { InputPasswordViewModel(get(),get()) }
     //use cases
-    factory { TonWalletUseCase(get()) }
+    factory { TonWalletUseCase(get(),get()) }
     factory { FormatStringUseCase() }
+    factory { UserUseCase(get(),get()) }
 
     single { createHttpClient(get()) }
     single { httpClientEngine() }
 
-    single { TonChatApiRepositoryImpl(get()) }
+    single { TonChatApiRepositoryImpl(get(),get()) }
+    single <UserApiRepository>{ UserApiRepositoryImpl(get(),get())}
+    single { getSettings(getKoin()) }
+    single <SecureStorageRepository> { SecureStorageRepositoryImpl(get()) }
+    single <SecurePrivateExecutionAndStorageRepository>{
+        securePrivateExecutionAndStorageRepositoryImpl()
+    }
+    single <Password> { Password() }
 
 
 }

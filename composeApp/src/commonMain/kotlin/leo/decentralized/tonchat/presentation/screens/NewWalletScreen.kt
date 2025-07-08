@@ -32,11 +32,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import leo.decentralized.tonchat.presentation.viewmodel.NewWalletViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
+
 @Composable
-fun NewWalletScreen() {
+fun NewWalletScreen(
+    navController: NavController
+) {
     val vm: NewWalletViewModel = koinViewModel()
     val snackBarHostState = SnackbarHostState()
     LaunchedEffect(vm.snackBarText.value) {
@@ -82,7 +86,7 @@ fun NewWalletScreen() {
 
             DefaultScreen(
                 screenName = "New Wallet", onBack = {
-
+                    navController.popBackStack()
                 }, secondaryButton = {
                     Text(
                         text = if (!vm.isCopied.value) "Copy" else "Continue",
@@ -90,7 +94,7 @@ fun NewWalletScreen() {
                         color = MaterialTheme.colorScheme.primary,
                         style = MaterialTheme.typography.titleSmall,
                         modifier = Modifier
-                            .padding(vertical = 8.dp, horizontal = 4.dp)
+                            .padding(/*vertical = 8.dp,*/ horizontal = 4.dp)
                             .clickable(
                                 interactionSource = null,
                                 indication = ripple(color = MaterialTheme.colorScheme.primary),

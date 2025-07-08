@@ -33,6 +33,8 @@ kotlin {
 
     jvm("desktop")
 
+
+
     sourceSets {
         val desktopMain by getting
 
@@ -41,6 +43,9 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.koin.android)
             implementation(libs.ktor.client.okhttp)
+            implementation("androidx.security:security-crypto:1.0.0")
+            implementation(libs.bcpkix.jdk18on)
+
 
         }
         commonMain.dependencies {
@@ -61,17 +66,22 @@ kotlin {
 
             implementation(compose.materialIconsExtended)
 
-           // implementation("org.ton:ton-kotlin:0.2.18")
+            // implementation("org.ton:ton-kotlin:0.2.18")
             implementation(libs.bundles.ktor)
             implementation("org.ton:ton-kotlin-crypto:0.4.3")
+            implementation("com.russhwolf:multiplatform-settings:1.3.0")
+
+            implementation(libs.navigation.compose)
+
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
             implementation("org.ton:ton-kotlin-crypto:0.4.3")
-           implementation("org.ton:ton-kotlin-contract:0.4.3")
-           // implementation(libs.bundles.ktor)
+            implementation("org.ton:ton-kotlin-contract:0.4.3")
+
+            // implementation(libs.bundles.ktor)
         }
-        nativeMain.dependencies{
+        nativeMain.dependencies {
             implementation(libs.ktor.client.darwin)
         }
         desktopMain.dependencies {
@@ -80,6 +90,14 @@ kotlin {
             implementation(libs.kotlinx.coroutinesSwing)
         }
     }
+}
+
+
+
+
+compose.resources {
+    publicResClass = true
+    generateResClass = auto
 }
 /*configurations.all {
     resolutionStrategy.force("io.ktor:ktor-client-core:YOUR_CHOSEN_VERSION")
@@ -101,6 +119,8 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "META-INF/DEPENDENCIES"
+            excludes += "META-INF/versions/9/OSGI-INF/MANIFEST.MF"
         }
     }
     buildTypes {
@@ -130,7 +150,7 @@ compose.desktop {
             isEnabled = true  // false to disable proguard
             optimize = true
             obfuscate = true
-          //  configurationFiles.from("proguard-android-optimize.pro")
+            //  configurationFiles.from("proguard-android-optimize.pro")
         }
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)

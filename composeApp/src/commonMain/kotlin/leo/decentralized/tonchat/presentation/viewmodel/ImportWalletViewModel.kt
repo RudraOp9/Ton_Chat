@@ -7,13 +7,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import leo.decentralized.tonchat.data.dataModels.Password
 import leo.decentralized.tonchat.domain.usecase.FormatStringUseCase
 import leo.decentralized.tonchat.domain.usecase.TonWalletUseCase
 
 
 class ImportWalletViewModel(
     private val formatStringUseCase: FormatStringUseCase,
-    private val tonWalletUseCase: TonWalletUseCase
+    private val tonWalletUseCase: TonWalletUseCase,
+    private val password : Password
 ) : ViewModel() {
     val secretKeys = mutableStateOf(List(24) { "" })
     val isSecretKeys24 = mutableStateOf(false)
@@ -47,6 +49,8 @@ class ImportWalletViewModel(
     }
 
     fun toggleSecretKeys24() {
+        println("password is : " + password.password)
+        password.password = "changed"
         isSecretKeys24.value = !isSecretKeys24.value
     }
 

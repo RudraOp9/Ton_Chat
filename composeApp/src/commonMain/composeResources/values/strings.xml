@@ -1,0 +1,7 @@
+<resources>
+    <!-- screens -->
+    <string name="welcome">welcome</string>
+    <string name="import_wallet">import_wallet</string>">
+    <string name="create_new_wallet">create_new_wallet</string>
+    <string name="pass_code">pass_code</string>
+</resources>
