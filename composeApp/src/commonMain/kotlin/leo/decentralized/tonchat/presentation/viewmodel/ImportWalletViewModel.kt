@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import leo.decentralized.tonchat.data.dataModels.Password
 import leo.decentralized.tonchat.data.repositories.security.SecureStorageRepository
@@ -21,7 +20,7 @@ class ImportWalletViewModel(
     private val tonWalletUseCase: TonWalletUseCase,
     private val secureStorageRepository: SecureStorageRepository,
     private val userUseCase: UserUseCase,
-    private val password : Password
+    private val password: Password
 ) : ViewModel() {
     val secretKeys = mutableStateOf(List(24) { "" })
     val isSecretKeys24 = mutableStateOf(false)
@@ -34,6 +33,8 @@ class ImportWalletViewModel(
             ))
         }
     }
+
+    private lateinit var userFriendlyAddress: String
     val isLoadingText = mutableStateOf("")
     val isLoading = mutableStateOf(false)
     val snackBarText = mutableStateOf("")
@@ -42,23 +43,24 @@ class ImportWalletViewModel(
     fun importWallet() {
         isLoading.value = true
         viewModelScope.launch {
-            val wallet = tonWalletUseCase.generateWallet(secretKeys = if (isSecretKeys24.value) secretKeys.value else secretKeys.value.slice(0..11))
+            val wallet = tonWalletUseCase.generateWallet(
+                secretKeys = if (isSecretKeys24.value) secretKeys.value else secretKeys.value.slice(
+                    0..11
+                )
+            )
             if (wallet.success) {
-                snackBarText.value = wallet.result?.publicKeyHex ?: ""
-                    val privateKey = wallet.result?.privateKey ?: ByteArray(1)
-                    val publicKey = wallet.result?.publicKeyHex.toString()
-                    val userFriendlyAddress = wallet.result?.userFriendlyAddress.toString()
-                    secureStorageRepository.storeUserFriendlyAddress(userFriendlyAddress)
-                    secureStorageRepository.storePublicKey(publicKey.hexToByteArray())
-                    secureStorageRepository.storePrivateKey(privateKey)
+                val privateKey = wallet.result?.privateKey ?: ByteArray(1)
+                val publicKey = wallet.result?.publicKeyHex.toString()
+                userFriendlyAddress = wallet.result?.userFriendlyAddress.toString()
+                secureStorageRepository.storeUserFriendlyAddress(userFriendlyAddress)
+                secureStorageRepository.storePublicKey(publicKey.hexToByteArray())
+                secureStorageRepository.storePrivateKey(privateKey)
                 initAccount()
             } else {
                 snackBarText.value = wallet.error?.message.toString()
-                //forward the non null cause to developers
             }
             isLoading.value = false
         }
-
     }
 
     fun toggleSecretKeys24() {
@@ -109,27 +111,45 @@ class ImportWalletViewModel(
         return tonWalletUseCase.isWalletPhraseValid(phrase)
     }
 
-    fun initAccount(){
-        userUseCase.importWallet()
-
+    fun initAccount() {
         isLoadingText.value = "Initiating account..."
         isLoading.value = true
         viewModelScope.launch(Dispatchers.IO) {
-           /* val signedMsg = tonWalletUseCase.signMessage(privateKey, userFriendlyAddress.value)
+            val signedMsg = tonWalletUseCase.signMessage(userFriendlyAddress)
             if (signedMsg.success) {
                 val result = tonWalletUseCase.generateNewToken(
-                    publicKey,
-                    userFriendlyAddress.value,
+                    userFriendlyAddress,
                     signedMsg.result.toString()
                 )
                 if (result.success) {
                     println("token " + result.result)
                     result.result?.let {
                         secureStorageRepository.storeToken(token = it).onSuccess {
-                            initAccount()
-                            isLoading.value = false
-                            snackBarText.value = "Account created successfully"
-                        }.onFailure {it->
+                            val existStatus = userUseCase.checkUserExist(userFriendlyAddress)
+                            if (existStatus.success) {
+                                // User exists, proceed with login or other actions
+                                if (existStatus.result == true) {
+                                    snackBarText.value = "Account exists. Logging in..."
+                                    //    login()
+                                } else {
+                                    snackBarText.value = "Initiating Account..."
+                                    val newUserStatus = userUseCase.createNewUser()
+                                    if (newUserStatus.success) {
+                                        snackBarText.value = "Account created successfully"
+                                        //login()
+                                    } else {
+                                        snackBarText.value =
+                                            newUserStatus.error?.message ?: "Something went wrong"
+                                    }
+
+                                }
+                            } else {
+                                isLoading.value = false
+                                snackBarText.value =
+                                    existStatus.error?.message ?: "Something went wrong"
+
+                            }
+                        }.onFailure { it ->
                             snackBarText.value = it.message.toString()
                             isLoading.value = false
                             isLoadingText.value = ""
@@ -137,14 +157,12 @@ class ImportWalletViewModel(
                     }
                 } else {
                     isLoading.value = true
-                    snackBarText.value = signedMsg.error?.message?:""
+                    snackBarText.value = signedMsg.error?.message ?: ""
                 }
             } else {
                 isLoading.value = true
-                snackBarText.value = signedMsg.error?.message?:""
-            }*/
+                snackBarText.value = signedMsg.error?.message ?: ""
+            }
         }
-
-
     }
 }

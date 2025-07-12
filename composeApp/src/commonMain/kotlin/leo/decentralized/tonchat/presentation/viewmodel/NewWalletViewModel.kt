@@ -58,10 +58,9 @@ class NewWalletViewModel(
             isLoadingText.value = "Initiating account..."
             isLoading.value = true
             viewModelScope.launch(Dispatchers.IO) {
-                val signedMsg = tonWalletUseCase.signMessage(privateKey, userFriendlyAddress.value)
+                val signedMsg = tonWalletUseCase.signMessage(userFriendlyAddress.value)
                 if (signedMsg.success) {
                     val result = tonWalletUseCase.generateNewToken(
-                        publicKey,
                         userFriendlyAddress.value,
                         signedMsg.result.toString()
                     )
@@ -106,5 +105,6 @@ class NewWalletViewModel(
         }
         isLoading.value = false
         isLoadingText.value = ""
+        //login()
     }
 }

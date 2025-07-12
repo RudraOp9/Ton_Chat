@@ -5,6 +5,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.Url
+import leo.decentralized.tonchat.data.dataModels.CheckUserExistResponse
 import leo.decentralized.tonchat.data.dataModels.GenericMessageResponse
 import leo.decentralized.tonchat.data.repositories.security.SecureStorageRepository
 import leo.decentralized.tonchat.utils.Result
@@ -14,7 +15,6 @@ class UserApiRepositoryImpl(
     private val secureStorageRepository: SecureStorageRepository
 ): UserApiRepository {
     override suspend fun newUser(
-        token : String,
         publicKey: String,
         address: String
     ): Result<String> {
@@ -31,11 +31,33 @@ class UserApiRepositoryImpl(
 
                 }
             val response = request.body<GenericMessageResponse>()
-            print(request.bodyAsText())
-            println(response.toString())
 
             return if (request.status.value in 200..299) {
                 Result(true, response.message)
+            } else {
+                Result(false, error = Exception(response.message ?: "Something went wrong"))
+            }
+        } catch (e: Exception) {
+            return Result(false, error = e)
+        }
+    }
+
+    override suspend fun checkUserExist(
+        address: String
+    ): Result<Boolean> {
+        try {
+            val request =
+                httpClient.get(url = Url("https://ton-decentralized-chat.vercel.app/api/user/checkUserExist")) {
+                    headers["address"] = address
+                    secureStorageRepository.getToken().onSuccess {
+                        headers["token"] = it
+                    }.onFailure { e ->
+                        return Result(false, error = Exception(e.message))
+                    }
+                }
+            val response = request.body<CheckUserExistResponse>()
+            return if (request.status.value in 200..299) {
+                Result(true, response.exists)
             } else {
                 Result(false, error = Exception(response.message ?: "Something went wrong"))
             }

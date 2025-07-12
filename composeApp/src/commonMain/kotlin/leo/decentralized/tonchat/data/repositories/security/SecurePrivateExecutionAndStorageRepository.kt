@@ -1,5 +1,6 @@
 package leo.decentralized.tonchat.data.repositories.security
 
+@Deprecated("Can't save ed25519 in keystore")
 interface SecurePrivateExecutionAndStorageRepository {
     suspend fun storePrivateKey(privateKey: ByteArray, publicKey: ByteArray,pass:String): Result<Boolean>
     fun deletePrivateKey(pass:String): Result<Boolean>

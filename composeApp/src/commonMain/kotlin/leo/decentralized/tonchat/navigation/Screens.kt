@@ -13,6 +13,8 @@ enum class Screens(val screen: String) {
     NewWallet(screen = Res.string.create_new_wallet.key),
 }
 
+//interface Screen
+
 @Immutable
 @Serializable
 data class PassCode(val isNew: Boolean, val goTo: String)

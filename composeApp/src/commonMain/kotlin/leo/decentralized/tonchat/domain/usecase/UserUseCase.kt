@@ -10,13 +10,11 @@ class UserUseCase(
 ) {
     @OptIn(ExperimentalStdlibApi::class)
     suspend fun createNewUser(): Result<Boolean> {
-        val token = secureStorageRepository.getToken()
         val publicKey = secureStorageRepository.getPublicKey()
         val address = secureStorageRepository.getUserFriendlyAddress()
-        if (token.isSuccess && publicKey.isSuccess && address.isSuccess) {
+        if ( publicKey.isSuccess && address.isSuccess) {
             val response =
                 userApiRepository.newUser(
-                    token = token.getOrNull() ?: "",
                     publicKey = (publicKey.getOrNull() ?: ByteArray(0)).toHexString(),
                     address = address.getOrNull() ?: ""
                 )
@@ -33,5 +31,14 @@ class UserUseCase(
 
     fun importWallet():Result<Boolean> {
         TODO("Not yet implemented")
+    }
+
+    suspend fun checkUserExist(address:String):Result<Boolean> {
+        val response = userApiRepository.checkUserExist(address)
+        return if (response.success){
+            Result(true,response.result)
+        }else{
+            Result(false, error = response.error?: Exception("Something went wrong"))
+        }
     }
 }
