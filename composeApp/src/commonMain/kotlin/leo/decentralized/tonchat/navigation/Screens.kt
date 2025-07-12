@@ -1,5 +1,6 @@
 package leo.decentralized.tonchat.navigation
 
+import androidx.compose.runtime.Immutable
 import kotlinx.serialization.Serializable
 import ton_decentralized_chat.composeapp.generated.resources.Res
 import ton_decentralized_chat.composeapp.generated.resources.create_new_wallet
@@ -12,5 +13,6 @@ enum class Screens(val screen: String) {
     NewWallet(screen = Res.string.create_new_wallet.key),
 }
 
+@Immutable
 @Serializable
 data class PassCode(val isNew: Boolean, val goTo: String)

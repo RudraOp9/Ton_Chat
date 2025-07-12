@@ -30,4 +30,8 @@ class UserUseCase(
             return Result(false, error = Exception(""))
         }
     }
+
+    fun importWallet():Result<Boolean> {
+        TODO("Not yet implemented")
+    }
 }

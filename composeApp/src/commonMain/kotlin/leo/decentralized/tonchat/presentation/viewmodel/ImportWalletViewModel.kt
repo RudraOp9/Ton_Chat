@@ -5,16 +5,22 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import leo.decentralized.tonchat.data.dataModels.Password
+import leo.decentralized.tonchat.data.repositories.security.SecureStorageRepository
 import leo.decentralized.tonchat.domain.usecase.FormatStringUseCase
 import leo.decentralized.tonchat.domain.usecase.TonWalletUseCase
+import leo.decentralized.tonchat.domain.usecase.UserUseCase
 
 
 class ImportWalletViewModel(
     private val formatStringUseCase: FormatStringUseCase,
     private val tonWalletUseCase: TonWalletUseCase,
+    private val secureStorageRepository: SecureStorageRepository,
+    private val userUseCase: UserUseCase,
     private val password : Password
 ) : ViewModel() {
     val secretKeys = mutableStateOf(List(24) { "" })
@@ -32,13 +38,20 @@ class ImportWalletViewModel(
     val isLoading = mutableStateOf(false)
     val snackBarText = mutableStateOf("")
 
+    @OptIn(ExperimentalStdlibApi::class)
     fun importWallet() {
         isLoading.value = true
         viewModelScope.launch {
-            delay(2000)
             val wallet = tonWalletUseCase.generateWallet(secretKeys = if (isSecretKeys24.value) secretKeys.value else secretKeys.value.slice(0..11))
             if (wallet.success) {
                 snackBarText.value = wallet.result?.publicKeyHex ?: ""
+                    val privateKey = wallet.result?.privateKey ?: ByteArray(1)
+                    val publicKey = wallet.result?.publicKeyHex.toString()
+                    val userFriendlyAddress = wallet.result?.userFriendlyAddress.toString()
+                    secureStorageRepository.storeUserFriendlyAddress(userFriendlyAddress)
+                    secureStorageRepository.storePublicKey(publicKey.hexToByteArray())
+                    secureStorageRepository.storePrivateKey(privateKey)
+                initAccount()
             } else {
                 snackBarText.value = wallet.error?.message.toString()
                 //forward the non null cause to developers
@@ -94,5 +107,44 @@ class ImportWalletViewModel(
 
     fun checkWalletPhrase(phrase: String): Boolean {
         return tonWalletUseCase.isWalletPhraseValid(phrase)
+    }
+
+    fun initAccount(){
+        userUseCase.importWallet()
+
+        isLoadingText.value = "Initiating account..."
+        isLoading.value = true
+        viewModelScope.launch(Dispatchers.IO) {
+           /* val signedMsg = tonWalletUseCase.signMessage(privateKey, userFriendlyAddress.value)
+            if (signedMsg.success) {
+                val result = tonWalletUseCase.generateNewToken(
+                    publicKey,
+                    userFriendlyAddress.value,
+                    signedMsg.result.toString()
+                )
+                if (result.success) {
+                    println("token " + result.result)
+                    result.result?.let {
+                        secureStorageRepository.storeToken(token = it).onSuccess {
+                            initAccount()
+                            isLoading.value = false
+                            snackBarText.value = "Account created successfully"
+                        }.onFailure {it->
+                            snackBarText.value = it.message.toString()
+                            isLoading.value = false
+                            isLoadingText.value = ""
+                        }
+                    }
+                } else {
+                    isLoading.value = true
+                    snackBarText.value = signedMsg.error?.message?:""
+                }
+            } else {
+                isLoading.value = true
+                snackBarText.value = signedMsg.error?.message?:""
+            }*/
+        }
+
+
     }
 }

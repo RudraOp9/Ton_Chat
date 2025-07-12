@@ -73,6 +73,10 @@ kotlin {
 
             implementation(libs.navigation.compose)
 
+            implementation("io.github.theapache64:rebugger:1.0.0-rc03")
+
+
+
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -99,15 +103,14 @@ compose.resources {
     publicResClass = true
     generateResClass = auto
 }
-/*configurations.all {
-    resolutionStrategy.force("io.ktor:ktor-client-core:YOUR_CHOSEN_VERSION")
-    resolutionStrategy.force("io.ktor:ktor-client-serialization:YOUR_CHOSEN_VERSION")
-    // Add for all Ktor modules you use or ton-kotlin might use
-}*/
 
 android {
     namespace = "leo.decentralized.tonchat"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
+
+    lint {
+        disable.add("NullSafeMutableLiveData")
+    }
 
     defaultConfig {
         applicationId = "leo.decentralized.tonchat"
@@ -125,7 +128,12 @@ android {
     }
     buildTypes {
         getByName("release") {
-            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            isMinifyEnabled = true
+            isShrinkResources = true
         }
     }
     compileOptions {

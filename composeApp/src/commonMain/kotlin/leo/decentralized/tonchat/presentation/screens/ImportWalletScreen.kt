@@ -69,7 +69,6 @@ fun ImportWalletScreen(
         DefaultScreen(screenName = "Import Wallet", onBack = {
             navController.popBackStack()
         }, secondaryButton = {
-
             Text(
                 text = if (!vm.isSecretKeysValid.value) "Paste" else "Continue",
                 textAlign = TextAlign.Center,

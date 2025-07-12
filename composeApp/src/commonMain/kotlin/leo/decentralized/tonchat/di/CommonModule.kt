@@ -23,7 +23,7 @@ import org.koin.dsl.module
 val commonModule = module {
 
     //view models
-    viewModel { ImportWalletViewModel(get(), get(),get()) }
+    viewModel { ImportWalletViewModel(get(), get(),get(),get(),get()) }
     viewModel { NewWalletViewModel(get(),get(),get()) }
     viewModel { InputPasswordViewModel(get(),get()) }
     //use cases

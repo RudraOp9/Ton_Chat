@@ -36,7 +36,7 @@ fun NavHost() {
 
         composable<PassCode> {
             val passCode = it.toRoute<PassCode>()
-            InputPasswordScreen(navHostController,passCode)
+            InputPasswordScreen(navHostController,passCode.isNew,passCode.goTo)
         }
 
         composable(Screens.ImportWallet.screen) {

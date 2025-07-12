@@ -17,52 +17,106 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Backspace
-import androidx.compose.material.icons.filled.Backspace
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.hapticfeedback.HapticFeedback
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import leo.decentralized.tonchat.navigation.PassCode
-import leo.decentralized.tonchat.navigation.Screens
 import leo.decentralized.tonchat.presentation.viewmodel.InputPasswordViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun InputPasswordScreen(navHost: NavHostController,passCode:PassCode){
-    val enteredPin = remember { mutableStateListOf<Int>() }
-    var firstPin by remember { mutableStateOf<String?>(null) }
-    val maxPinLength = 4
-    var isConfirming by remember { mutableStateOf(false) }
-    var isError by remember { mutableStateOf(false) }
-    val vm : InputPasswordViewModel = koinViewModel()
+fun InputPasswordScreen(navHost: NavHostController, isNew: Boolean, goTo: String) {
+    var firstPin by rememberSaveable { mutableStateOf("") }
+    var isConfirming by rememberSaveable { mutableStateOf(false) }
+    var isError by rememberSaveable { mutableStateOf(false) }
+    val vm: InputPasswordViewModel = koinViewModel()
+
+    val onErrorFinishedCallback = remember {
+        {
+            isError = false
+        }
+    }
+    val onNumberClickCallback = remember {
+        { number:Int ->
+            if (vm.enteredPin.value.length < 4) {
+                vm.enteredPin.value += number
+            }
+        }
+    }
+    val onBackspaceClickCallback = remember {
+        {
+            if (vm.enteredPin.value.isNotEmpty()) {
+                vm.enteredPin.value = vm.enteredPin.value.dropLast(1)
+            }
+        }
+    }
+
+    LaunchedEffect(vm.enteredPin.value){
+        if (vm.enteredPin.value.length == 4) {
+            delay(100) // let the animation finish
+            val pinString = vm.enteredPin.value
+            if (isNew) {
+                if (isConfirming) {
+                    if (pinString == firstPin) {
+                        vm.savePassword(vm.enteredPin.value)
+                        navHost.navigate(goTo) {
+                            popUpTo(PassCode(isNew, goTo)) {
+                                inclusive = true
+                            }
+                        }
+                    } else {
+                        isError = true
+                        println("PINs do not match. Try again.")
+                        vm.enteredPin.value = ""
+                    }
+                } else {
+                    firstPin = pinString
+                    isConfirming = true
+                    vm.enteredPin.value = ""
+                }
+            } else {
+                //validate pin todo : max attempts
+                vm.checkPassAndContinue(vm.enteredPin.value)
+                    .onSuccess { // Example: incorrect PIN
+                        vm.enteredPin.value = ""
+                        firstPin = ""
+                        //todo continue surfing
+                    }.onFailure {
+                        vm.enteredPin.value = ""
+                        isError = true
+                    }
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -78,80 +132,36 @@ fun InputPasswordScreen(navHost: NavHostController,passCode:PassCode){
         ) {
             Spacer(modifier = Modifier.height(60.dp))
             Text(
-                text = if (passCode.isNew && isConfirming) "Confirm Passcode" else if (passCode.isNew && !isConfirming) "Set Passcode" else "Enter Passcode",
+                text = if (isNew && isConfirming) "Confirm Passcode" else if (isNew && !isConfirming) "Set Passcode" else "Enter Passcode",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = (if (passCode.isNew && isConfirming) "Re-enter" else if (passCode.isNew && !isConfirming) "Create a" else "Enter your" )+" 4-digit passcode.",
+                text = (if (isNew && isConfirming) "Re-enter" else if (isNew && !isConfirming) "Create a" else "Enter your") + " 4-digit ",
                 fontSize = 16.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(modifier = Modifier.height(40.dp))
-            PinDots(enteredLength = enteredPin.size, maxLength = maxPinLength, isError = isError){
-                isError = false
-            }
+            PinDots(enteredLength = vm.enteredPin.value.count(), isError = isError,onErrorFinishedCallback)
         }
         NumericKeyboard(
-            onNumberClick = { number ->
-                if (enteredPin.size < maxPinLength) {
-                    enteredPin.add(number)
-                    if (enteredPin.size == maxPinLength) {
-                        val pinString = enteredPin.joinToString("")
-                        if (passCode.isNew) {
-                            if (isConfirming) {
-                                if (pinString == firstPin) {
-                                    vm.savePassword(enteredPin.joinToString(""))
-                                    navHost.navigate(passCode.goTo){
-                                        popUpTo(passCode){
-                                            inclusive = true
-                                        }
-                                    }
-                                } else {
-                                    isError = true
-                                    println("PINs do not match. Try again.")
-                                    enteredPin.clear()
-                                }
-                            } else {
-                                firstPin = pinString
-                                isConfirming = true
-                                enteredPin.clear()
-                            }
-                        } else {
-                            //validate pin todo : max attempts
-                            vm.checkPassAndContinue(enteredPin.joinToString("")).onSuccess { // Example: incorrect PIN
-                                enteredPin.clear()
-                                firstPin = null
-                                //todo continue surfing
-                            }.onFailure {
-                                enteredPin.clear()
-                                isError = true
-                            }
-                        }
-                    }
-                }
-            },
-            onBackspaceClick = {
-                if (enteredPin.isNotEmpty()) {
-                    enteredPin.removeLast()
-                    isError = false // Reset error state on backspace
-                }
-            }
+            onNumberClick = onNumberClickCallback,
+            onBackspaceClick = onBackspaceClickCallback
         )
     }
 }
 
-
-
 @Composable
-fun PinDots(enteredLength: Int, maxLength: Int, isError: Boolean, onErrorFinished:()->Unit) {
+fun PinDots(enteredLength: Int, isError: Boolean, onErrorFinished: () -> Unit) {
     val scope = rememberCoroutineScope()
     val shakeOffset = remember { Animatable(0f) }
+    val length = rememberUpdatedState(enteredLength)
+    val error = rememberUpdatedState(isError)
 
-    LaunchedEffect(isError) {
-        if (isError) {
+    LaunchedEffect(error.value) {
+        if (error.value) {
             scope.launch {
                 shakeOffset.animateTo(
                     targetValue = 20f,
@@ -163,30 +173,38 @@ fun PinDots(enteredLength: Int, maxLength: Int, isError: Boolean, onErrorFinishe
                 )
                 shakeOffset.animateTo(0f, animationSpec = tween(durationMillis = 50))
                 onErrorFinished()
-
             }
         }
     }
 
     Row(
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(start = shakeOffset.value.dp) // Apply shake animation
+        modifier = Modifier.offset{
+            IntOffset(x = shakeOffset.value.toInt(),y = 0)
+        } // Apply shake animation
     ) {
-        for (i in 0 until maxLength) {
-            val dotColor = animateColorAsState(
-                targetValue = if (isError) MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.8f)
-                else if (i < enteredLength) MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
-                else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f),
-                animationSpec = tween(durationMillis = if (isError) 0 else 300), label = "dot color" // Faster color change on error
-            )
-            Box(
-                modifier = Modifier
-                    .size(16.dp)
-                    .clip(CircleShape)
-                    .background(dotColor.value),
-            )
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(count = 4, key = { it }) {index ->
+                val dotColor = animateColorAsState(
+                    targetValue = if (error.value) MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.8f)
+                    else if (index < length.value) MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                    else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f),
+                    animationSpec = tween(durationMillis = if (error.value) 0 else 200),
+                    label = "dot color" // Faster color change on error
+                )
+                Box(
+                    modifier = Modifier
+                        .size(16.dp)
+                        .clip(CircleShape)
+                        .drawBehind {
+                            drawRect(dotColor.value)
+                        }
+                )
+            }
         }
+
     }
 }
 
@@ -240,13 +258,18 @@ fun KeyboardButton(text: String, onClick: () -> Unit) {
         modifier = Modifier
             .size(72.dp)
             .clip(CircleShape)
-            .clickable(remember{
-                MutableInteractionSource()},null, onClick = onClick)
+            .clickable(remember {
+                MutableInteractionSource()
+            }, null, onClick = onClick)
             .padding(8.dp),
         contentAlignment = Alignment.Center
     ) {
         if (text == "<-") {
-            Icon(Icons.AutoMirrored.Filled.Backspace, contentDescription = "Backspace", tint = MaterialTheme.colorScheme.primary)
+            Icon(
+                Icons.AutoMirrored.Filled.Backspace,
+                contentDescription = "Backspace",
+                tint = MaterialTheme.colorScheme.primary
+            )
         } else {
             Text(text = text, fontSize = 28.sp, color = MaterialTheme.colorScheme.primary)
         }

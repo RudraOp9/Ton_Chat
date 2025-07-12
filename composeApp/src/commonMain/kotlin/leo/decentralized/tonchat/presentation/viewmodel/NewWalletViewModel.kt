@@ -57,8 +57,8 @@ class NewWalletViewModel(
         if (isCopied.value) {
             isLoadingText.value = "Initiating account..."
             isLoading.value = true
-            val signedMsg = tonWalletUseCase.signMessage(privateKey, userFriendlyAddress.value)
             viewModelScope.launch(Dispatchers.IO) {
+                val signedMsg = tonWalletUseCase.signMessage(privateKey, userFriendlyAddress.value)
                 if (signedMsg.success) {
                     val result = tonWalletUseCase.generateNewToken(
                         publicKey,

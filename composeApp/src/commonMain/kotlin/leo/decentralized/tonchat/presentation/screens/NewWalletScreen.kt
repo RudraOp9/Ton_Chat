@@ -81,9 +81,6 @@ fun NewWalletScreen(
                 })
             }
 
-
-
-
             DefaultScreen(
                 screenName = "New Wallet", onBack = {
                     navController.popBackStack()
@@ -109,65 +106,7 @@ fun NewWalletScreen(
                     )
                 },
                 postLazyContent = {
-                    /*Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        LazyVerticalGrid(
-                            columns = GridCells.Fixed(2),
-                            modifier = Modifier,
-                            horizontalArrangement = Arrangement.Center,
 
-                            ) {
-                            items(vm.secretKeys.value.size) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = if ((it + 1) % 2 == 0) Arrangement.Start else Arrangement.End
-                                ) {
-                                    Row(modifier = Modifier.wrapContentWidth()) {
-                                        Text(
-                                            text = "${it + 1}.",
-                                            modifier = Modifier.width(24.dp),
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                                            textAlign = TextAlign.End,
-                                        )
-                                        Spacer(Modifier.padding(start = 8.dp))
-                                        SelectionContainer {
-                                            Text(
-                                                text = vm.secretKeys.value[it],
-                                                modifier = Modifier.padding(end = 50.dp),
-                                                style = MaterialTheme.typography.bodyMedium,
-                                                color = MaterialTheme.colorScheme.onSurface,
-                                                fontWeight = FontWeight.SemiBold
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    Column(
-                        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)
-                            .navigationBarsPadding(),
-                        verticalArrangement = Arrangement.Bottom
-                    ) {
-                        Button(
-                            onClick = {
-                                vm.canContinue()
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(40)
-                        ) {
-                            Text(
-                                text = "Continue",
-                                textAlign = TextAlign.Center,
-                                style = MaterialTheme.typography.titleMedium
-                            )
-                        }
-                    }
-
-                }*/
                 }
             ) {
                 item {
