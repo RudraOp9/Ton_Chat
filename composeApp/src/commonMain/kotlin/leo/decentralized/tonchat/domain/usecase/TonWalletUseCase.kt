@@ -3,6 +3,7 @@ package leo.decentralized.tonchat.domain.usecase
 import io.ktor.utils.io.charsets.MalformedInputException
 import leo.decentralized.tonchat.data.repositories.network.tonChatApi.TonChatApiRepositoryImpl
 import leo.decentralized.tonchat.data.repositories.security.SecurePrivateExecutionAndStorageRepository
+import leo.decentralized.tonchat.data.repositories.security.SecureStorageRepository
 import leo.decentralized.tonchat.utils.Result
 import org.ton.crypto.Ed25519
 import org.ton.crypto.SecureRandom
@@ -17,7 +18,7 @@ data class GenerateWalletResult(
 
 class TonWalletUseCase(
     private val tonChatApi: TonChatApiRepositoryImpl,
-    private val secureExec: SecurePrivateExecutionAndStorageRepository
+    private val secureExec: SecureStorageRepository
 ) {
     fun isWalletPhrasesValid(secretKeys: List<String>): Boolean {
         return secretKeys.all { Mnemonic.bip39English().contains(it) }
@@ -27,7 +28,7 @@ class TonWalletUseCase(
         return Mnemonic.bip39English().contains(secretKey)
     }
 
-    suspend fun generateMnemonics(size: Int): List<String> {
+    fun generateMnemonics(size: Int): List<String> {
         return Mnemonic.generate(random = SecureRandom, wordsCount = size).words.toList()
     }
 
@@ -38,14 +39,12 @@ class TonWalletUseCase(
                 val result = Mnemonic(secretKeys).toSeed()
                 val privateKey = result.slice(0..31).toByteArray()
                 val publicKey = Ed25519.publicKey(privateKey)
-                secureExec.storePrivateKey(privateKey,publicKey,"1234").onSuccess {
-                    println("result2 $it")
-                }.onFailure {
-                    println("result2 "+it.message)
-                    it.printStackTrace()
-                }
+
+                val storedPrivateKey = secureExec.storePrivateKey(privateKey)
+                if(!storedPrivateKey.isSuccess) throw Exception(storedPrivateKey.exceptionOrNull())
+
                 val userFriendlyAddress = tonChatApi.getWalletAddress(publicKey.toHexString())
-                if (userFriendlyAddress.success == false) throw userFriendlyAddress.error
+                if (!userFriendlyAddress.success) throw userFriendlyAddress.error
                     ?: MalformedInputException(
                         message = userFriendlyAddress.result ?: "Something went wrong"
                     )
@@ -65,18 +64,16 @@ class TonWalletUseCase(
     }
 
     @OptIn(ExperimentalStdlibApi::class)
-    fun signMessage(privateKey: ByteArray, message: String): Result<String> {
+    fun signMessage(message: String): Result<String> {
         try {
-            val result = Ed25519.sign(privateKey, message.encodeToByteArray())
-            println("result " +result.toHexString())
-            secureExec.signMessage(message,"1234").onSuccess {
-                println("result2 "+it.toHexString())
-            }.onFailure {
-                println("result2 "+it.message)
-                it.printStackTrace()
+            val privateKeyResult = secureExec.getPrivateKey()
+            return if (privateKeyResult.isSuccess) {
+                val privateKey = privateKeyResult.getOrThrow()
+                val signature = Ed25519.sign(privateKey, message.encodeToByteArray())
+                Result(true, result = signature.toHexString())
+            } else {
+                Result(false, error = Exception(privateKeyResult.exceptionOrNull()))
             }
-
-            return Result(true, result = result.toHexString())
         } catch (e: Exception) {
             return Result(false, error = e)
         }
@@ -94,10 +91,10 @@ class TonWalletUseCase(
             address = address,
             signature = signature
         )
-        if (result.success) {
-            return Result(true, result = result.result?.token)
+        return if (result.success) {
+            Result(true, result = result.result?.token)
         } else {
-            return Result(false, error = result.error)
+            Result(false, error = result.error)
         }
         //todo save valid till
     }
