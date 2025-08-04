@@ -8,13 +8,13 @@ import io.ktor.http.Url
 import leo.decentralized.tonchat.data.dataModels.GenToken
 import leo.decentralized.tonchat.data.dataModels.GetV4R2Address
 import leo.decentralized.tonchat.data.repositories.security.SecureStorageRepository
-import leo.decentralized.tonchat.utils.Result
+import leo.decentralized.tonchat.utils.Effect
 
 class TonChatApiRepositoryImpl(
     private val httpClient: HttpClient,
     private val secureStorageRepository: SecureStorageRepository
 ) : TonChatApiRepository {
-    override suspend fun getWalletAddress(publicKey: String): Result<String> {
+    override suspend fun getWalletAddress(publicKey: String): Effect<String> {
         try {
             val request =
                 httpClient.get(url = Url("https://ton-decentralized-chat.vercel.app/api/ton/generateV4R2Wallet")) {
@@ -23,9 +23,9 @@ class TonChatApiRepositoryImpl(
             val response = request.body<GetV4R2Address>()
             print(request.bodyAsText())
             println(response.toString())
-            return Result(true, response.address)
+            return Effect(true, response.address)
         } catch (e: Exception) {
-            return Result(false, error = e)
+            return Effect(false, error = e)
         }
     }
 
@@ -33,7 +33,7 @@ class TonChatApiRepositoryImpl(
         publicKey: String,
         address: String,
         signature: String
-    ): Result<GenToken> {
+    ): Effect<GenToken> {
         try {
             val request =
                 httpClient.get(url = Url("https://ton-decentralized-chat.vercel.app/api/auth/genToken")) {
@@ -46,12 +46,12 @@ class TonChatApiRepositoryImpl(
             println(response.toString())
 
             return if (request.status.value in 200..299) {
-                Result(true, response)
+                Effect(true, response)
             } else {
-                Result(false, error = Exception(response.message ?: "Something went wrong"))
+                Effect(false, error = Exception(response.message ?: "Something went wrong"))
             }
         } catch (e: Exception) {
-            return Result(false, error = e)
+            return Effect(false, error = e)
         }
 
     }

@@ -3,12 +3,11 @@ package leo.decentralized.tonchat.data.repositories.network.userApi
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.Url
 import leo.decentralized.tonchat.data.dataModels.CheckUserExistResponse
 import leo.decentralized.tonchat.data.dataModels.GenericMessageResponse
 import leo.decentralized.tonchat.data.repositories.security.SecureStorageRepository
-import leo.decentralized.tonchat.utils.Result
+import leo.decentralized.tonchat.utils.Effect
 
 class UserApiRepositoryImpl(
     private val httpClient: HttpClient,
@@ -17,7 +16,7 @@ class UserApiRepositoryImpl(
     override suspend fun newUser(
         publicKey: String,
         address: String
-    ): Result<String> {
+    ): Effect<String> {
         try {
             val request =
                 httpClient.get(url = Url("https://ton-decentralized-chat.vercel.app/api/user/newUser")) {
@@ -26,25 +25,25 @@ class UserApiRepositoryImpl(
                     secureStorageRepository.getToken().onSuccess {
                         headers["token"] = it
                     }.onFailure { e ->
-                        return Result(false, error = Exception(e.message))
+                        return Effect(false, error = Exception(e.message))
                     }
 
                 }
             val response = request.body<GenericMessageResponse>()
 
             return if (request.status.value in 200..299) {
-                Result(true, response.message)
+                Effect(true, response.message)
             } else {
-                Result(false, error = Exception(response.message ?: "Something went wrong"))
+                Effect(false, error = Exception(response.message ?: "Something went wrong"))
             }
         } catch (e: Exception) {
-            return Result(false, error = e)
+            return Effect(false, error = e)
         }
     }
 
     override suspend fun checkUserExist(
         address: String
-    ): Result<Boolean> {
+    ): Effect<Boolean> {
         try {
             val request =
                 httpClient.get(url = Url("https://ton-decentralized-chat.vercel.app/api/user/checkUserExist")) {
@@ -52,17 +51,17 @@ class UserApiRepositoryImpl(
                     secureStorageRepository.getToken().onSuccess {
                         headers["token"] = it
                     }.onFailure { e ->
-                        return Result(false, error = Exception(e.message))
+                        return Effect(false, error = Exception(e.message))
                     }
                 }
             val response = request.body<CheckUserExistResponse>()
             return if (request.status.value in 200..299) {
-                Result(true, response.exists)
+                Effect(true, response.exists)
             } else {
-                Result(false, error = Exception(response.message ?: "Something went wrong"))
+                Effect(false, error = Exception(response.message ?: "Something went wrong"))
             }
         } catch (e: Exception) {
-            return Result(false, error = e)
+            return Effect(false, error = e)
         }
     }
 }
