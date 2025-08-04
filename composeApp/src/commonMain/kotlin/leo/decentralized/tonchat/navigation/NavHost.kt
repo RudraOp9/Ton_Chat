@@ -16,13 +16,15 @@ import leo.decentralized.tonchat.presentation.screens.ImportWalletScreen
 import leo.decentralized.tonchat.presentation.screens.InputPasswordScreen
 import leo.decentralized.tonchat.presentation.screens.NewWalletScreen
 import leo.decentralized.tonchat.presentation.screens.WelcomeScreen
+import leo.decentralized.tonchat.presentation.screens.home.ChatScreen
+import leo.decentralized.tonchat.presentation.screens.home.HomeScreen
 
 @Composable
 fun NavHost() {
     val navHostController = rememberNavController()
     NavHost(
         navController = navHostController,
-        startDestination = Screens.Welcome.screen, //todo - later : splash screen
+        startDestination = Screens.HomeScreen.screen, //todo - later : splash screen
         modifier = Modifier
             .fillMaxSize()
             .background(
@@ -48,6 +50,16 @@ fun NavHost() {
             //todo erase data
             NewWalletScreen(navHostController)
         }
+
+        composable(Screens.HomeScreen.screen) {
+            HomeScreen(navHostController)
+        }
+
+        composable (Screens.ChatScreen.screen ){
+            ChatScreen(navHostController)
+        }
+
+
 
     }
 }

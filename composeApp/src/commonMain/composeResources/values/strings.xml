@@ -3,5 +3,7 @@
     <string name="welcome">welcome</string>
     <string name="import_wallet">import_wallet</string>">
     <string name="create_new_wallet">create_new_wallet</string>
+    <string name="home_screen">home_screen</string>
+    <string name="chat_screen">chat_screen</string>
     <string name="pass_code">pass_code</string>
 </resources>

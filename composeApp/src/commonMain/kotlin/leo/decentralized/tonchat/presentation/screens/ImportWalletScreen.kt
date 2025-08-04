@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.sharp.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -31,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
@@ -66,9 +69,9 @@ fun ImportWalletScreen(
         supportingText = vm.isLoadingText.value,
         snackbarHostState = snackBarHost
     ) {
-        DefaultScreen(screenName = "Import Wallet", onBack = {
+        DefaultScreen(screenName = "Import Wallet", onPrimaryClick = {
             navController.popBackStack()
-        }, secondaryButton = {
+        }, primaryButtonIcon = Icons.AutoMirrored.Sharp.ArrowBack, secondaryButton = {
             Text(
                 text = if (!vm.isSecretKeysValid.value) "Paste" else "Continue",
                 textAlign = TextAlign.Center,

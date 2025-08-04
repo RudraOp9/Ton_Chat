@@ -26,15 +26,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun DefaultScreen(
     modifier: Modifier = Modifier,
     screenName: String,
-    onBack: (() -> Unit)? = null,
+    onPrimaryClick: (() -> Unit)? = null,
+    primaryButtonIcon: ImageVector? = null,
     secondaryButton: @Composable () -> Unit = {},
     postLazyContent: @Composable () -> Unit = {},
+    horizontalPadding: Dp = 16.dp,
     content: LazyListScope.() -> Unit = {},
 ) {
     Column(
@@ -59,18 +63,18 @@ fun DefaultScreen(
                     .windowInsetsPadding(WindowInsets.statusBars.union(WindowInsets.displayCutout)),
                 contentAlignment = Alignment.BottomCenter
             ) {
-                if (onBack != null) {
+                if (onPrimaryClick != null && primaryButtonIcon != null) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Start,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Sharp.ArrowBack,
-                            contentDescription = "Back",
+                            imageVector = primaryButtonIcon,
+                            contentDescription = "Primary Button",
                             tint = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.clickable(
-                                interactionSource = null, indication = null, onClick = onBack
+                                interactionSource = null, indication = null, onClick = onPrimaryClick
                             )
                         )
                     }
@@ -97,7 +101,7 @@ fun DefaultScreen(
 
         }
         LazyColumn(
-            modifier = Modifier.padding(horizontal = 16.dp).padding(top = 4.dp)
+            modifier = Modifier.padding(horizontal = horizontalPadding).padding(top = 4.dp)
                 .navigationBarsPadding()
         ) {
             content()

@@ -64,8 +64,6 @@ class ImportWalletViewModel(
     }
 
     fun toggleSecretKeys24() {
-        println("password is : " + password.password)
-        password.password = "changed"
         isSecretKeys24.value = !isSecretKeys24.value
     }
 

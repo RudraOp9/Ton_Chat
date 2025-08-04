@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.sharp.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -82,9 +84,9 @@ fun NewWalletScreen(
             }
 
             DefaultScreen(
-                screenName = "New Wallet", onBack = {
+                screenName = "New Wallet", onPrimaryClick = {
                     navController.popBackStack()
-                }, secondaryButton = {
+                }, primaryButtonIcon = Icons.AutoMirrored.Sharp.ArrowBack, secondaryButton = {
                     Text(
                         text = if (!vm.isCopied.value) "Copy" else "Continue",
                         textAlign = TextAlign.Center,
