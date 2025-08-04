@@ -3,11 +3,16 @@ package leo.decentralized.tonchat.data.repositories.security
 import com.russhwolf.settings.Settings
 import io.ktor.util.hex
 
-class SecureStorageRepositoryImpl(private val settings: Settings):SecureStorageRepository  {
+class SecureStorageRepositoryImpl(
+    private val settings: Settings,
+    private val passwordEncryptionRepository: PasswordEncryptionRepository
+):SecureStorageRepository  {
 
     override fun storeToken(token: String): Result<Boolean> {
         try {
-            settings.putString("token", token).apply {
+            val result = passwordEncryptionRepository.encrypt(token)
+            if (!result.success) throw result.error!!
+            settings.putString("token", result.result!!).apply {
                 return Result.success(true)
             }
         }catch (e: Exception){
@@ -19,7 +24,9 @@ class SecureStorageRepositoryImpl(private val settings: Settings):SecureStorageR
         try {
             settings.getStringOrNull("token").let {
                 if (it == null) return Result.failure(Exception("Token not found"))
-                return Result.success(it)
+                val result = passwordEncryptionRepository.decrypt(it)
+                if (!result.success) throw result.error!!
+                return Result.success(result.result!!)
             }
         }catch (e: Exception){
             return Result.failure(e)
@@ -38,7 +45,9 @@ class SecureStorageRepositoryImpl(private val settings: Settings):SecureStorageR
 
     override fun storePrivateKey(privateKey: ByteArray): Result<Boolean> {
         try {
-            settings.putString("privateKey", hex(privateKey)).apply {
+            val result = passwordEncryptionRepository.encrypt(hex(privateKey))
+            if (!result.success) throw result.error!!
+            settings.putString("privateKey", result.result!!).apply {
                 return Result.success(true)
             }
         }catch (e: Exception){
@@ -50,7 +59,9 @@ class SecureStorageRepositoryImpl(private val settings: Settings):SecureStorageR
         try {
             settings.getStringOrNull("privateKey").let {
                 if (it == null) return Result.failure(Exception("privateKey not found"))
-                return Result.success(hex(it))
+                val result = passwordEncryptionRepository.decrypt(it)
+                if (!result.success) throw result.error!!
+                return Result.success(hex(result.result!!))
             }
         }catch (e: Exception){
             return Result.failure(e)
@@ -69,7 +80,9 @@ class SecureStorageRepositoryImpl(private val settings: Settings):SecureStorageR
 
     override fun storePublicKey(publicKey: ByteArray): Result<Boolean> {
         try {
-            settings.putString("publicKey", hex(publicKey)).apply {
+            val result = passwordEncryptionRepository.encrypt(hex(publicKey))
+            if (!result.success) throw result.error!!
+            settings.putString("publicKey", result.result!!).apply {
                 return Result.success(true)
             }
         }catch (e: Exception){
@@ -81,7 +94,9 @@ class SecureStorageRepositoryImpl(private val settings: Settings):SecureStorageR
         try {
             settings.getStringOrNull("publicKey").let {
                 if (it == null) return Result.failure(Exception("publicKey not found"))
-                return Result.success(hex(it))
+                val result = passwordEncryptionRepository.decrypt(it)
+                if (!result.success) throw result.error!!
+                return Result.success(hex(result.result!!))
             }
         }catch (e: Exception){
             return Result.failure(e)
@@ -100,7 +115,9 @@ class SecureStorageRepositoryImpl(private val settings: Settings):SecureStorageR
 
     override fun storeUserFriendlyAddress(userFriendlyAddress: String): Result<Boolean> {
         try {
-            settings.putString("userFriendlyAddress", userFriendlyAddress).apply {
+            val result = passwordEncryptionRepository.encrypt(userFriendlyAddress)
+            if (!result.success) throw result.error!!
+            settings.putString("userFriendlyAddress", result.result!!).apply {
                 return Result.success(true)
             }
         }catch (e: Exception){
@@ -112,7 +129,9 @@ class SecureStorageRepositoryImpl(private val settings: Settings):SecureStorageR
         try {
             settings.getStringOrNull("userFriendlyAddress").let {
                 if (it == null) return Result.failure(Exception("Address not found"))
-                return Result.success(it)
+                val result = passwordEncryptionRepository.decrypt(it)
+                if (!result.success) throw result.error!!
+                return Result.success(result.result!!)
             }
         }catch (e: Exception){
             return Result.failure(e)

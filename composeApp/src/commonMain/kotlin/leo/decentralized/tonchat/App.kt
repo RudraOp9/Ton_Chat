@@ -16,6 +16,7 @@ import leo.decentralized.tonchat.di.appModule
 import leo.decentralized.tonchat.navigation.NavHost
 import leo.decentralized.tonchat.presentation.screens.ImportWalletScreen
 import leo.decentralized.tonchat.presentation.screens.NewWalletScreen
+import leo.decentralized.tonchat.presentation.screens.home.HomeScreen
 import leo.decentralized.tonchat.presentation.theme.TonDecentralizedChatTheme
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -28,10 +29,10 @@ import ton_decentralized_chat.composeapp.generated.resources.compose_multiplatfo
 @Preview
 fun App(koinAppDeclaration: KoinAppDeclaration? = null) {
     KoinApplication(
-        application = {
+        application = remember {{
             koinAppDeclaration?.invoke(this)
             modules(appModule)
-        }
+        }}
     ) {
         TonDecentralizedChatTheme {
             Column(
