@@ -45,6 +45,7 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
             implementation("androidx.security:security-crypto:1.0.0")
             implementation(libs.bcpkix.jdk18on)
+            implementation("androidx.core:core-splashscreen:1.0.1")
 
 
         }

@@ -20,11 +20,11 @@ import leo.decentralized.tonchat.presentation.screens.home.ChatScreen
 import leo.decentralized.tonchat.presentation.screens.home.HomeScreen
 
 @Composable
-fun NavHost() {
+fun NavHost(defaultScreen:String) {
     val navHostController = rememberNavController()
     NavHost(
         navController = navHostController,
-        startDestination = Screens.HomeScreen.screen, //todo - later : splash screen
+        startDestination = defaultScreen,
         modifier = Modifier
             .fillMaxSize()
             .background(

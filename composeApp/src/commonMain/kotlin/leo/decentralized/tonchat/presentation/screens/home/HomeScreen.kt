@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -86,6 +87,8 @@ fun HomeScreen(navController: NavController,vm: ChatViewModel = koinViewModel())
             )
         }, postLazyContent = {
             HorizontalPager(
+                modifier = Modifier.padding(top = 4.dp)
+                    .navigationBarsPadding(),
                 state = rememberPagerState { 2 },
                 beyondViewportPageCount = 1,
                 userScrollEnabled = false,
@@ -108,10 +111,7 @@ fun HomeScreen(navController: NavController,vm: ChatViewModel = koinViewModel())
             )
         },
         horizontalPadding = 0.dp
-    ) {
-
-
-    }
+    )
 }
 
 @Composable

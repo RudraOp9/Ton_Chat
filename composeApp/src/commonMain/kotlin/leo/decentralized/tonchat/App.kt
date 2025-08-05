@@ -14,33 +14,44 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import leo.decentralized.tonchat.di.appModule
 import leo.decentralized.tonchat.navigation.NavHost
+import leo.decentralized.tonchat.navigation.Screens
 import leo.decentralized.tonchat.presentation.screens.ImportWalletScreen
 import leo.decentralized.tonchat.presentation.screens.NewWalletScreen
 import leo.decentralized.tonchat.presentation.screens.home.HomeScreen
 import leo.decentralized.tonchat.presentation.theme.TonDecentralizedChatTheme
+import leo.decentralized.tonchat.presentation.viewmodel.SplashScreenViewModel
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinApplication
+import org.koin.compose.viewmodel.koinViewModel
 import org.koin.dsl.KoinAppDeclaration
 import ton_decentralized_chat.composeapp.generated.resources.Res
 import ton_decentralized_chat.composeapp.generated.resources.compose_multiplatform
 
 @Composable
 @Preview
-fun App(koinAppDeclaration: KoinAppDeclaration? = null) {
+fun App(koinAppDeclaration: KoinAppDeclaration? = null, discardSplashScreen: () -> Unit) {
     KoinApplication(
         application = remember {{
             koinAppDeclaration?.invoke(this)
             modules(appModule)
         }}
     ) {
-        TonDecentralizedChatTheme {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                NavHost()
+        val vm : SplashScreenViewModel = koinViewModel()
+        LaunchedEffect(vm.isLoading.value){
+            if(!vm.isLoading.value){
+                discardSplashScreen()
+            }
+        }
+        if (!vm.isLoading.value) {
+            TonDecentralizedChatTheme {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    NavHost(vm.screen.value)
+                }
             }
         }
     }

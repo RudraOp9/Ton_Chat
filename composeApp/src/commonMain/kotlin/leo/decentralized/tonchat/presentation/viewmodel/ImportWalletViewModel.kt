@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
@@ -13,12 +14,13 @@ import leo.decentralized.tonchat.data.repositories.security.SecureStorageReposit
 import leo.decentralized.tonchat.domain.usecase.FormatStringUseCase
 import leo.decentralized.tonchat.domain.usecase.TonWalletUseCase
 import leo.decentralized.tonchat.domain.usecase.UserUseCase
+import leo.decentralized.tonchat.navigation.Screens
 
 
 class ImportWalletViewModel(
     private val formatStringUseCase: FormatStringUseCase,
     private val tonWalletUseCase: TonWalletUseCase,
-    private val secureStorageRepository: SecureStorageRepository,
+    private val secureStorageRepository: SecureStorageRepository, // todo : implement use case for this or use in existing one.
     private val userUseCase: UserUseCase,
     private val password: Password
 ) : ViewModel() {
@@ -40,7 +42,7 @@ class ImportWalletViewModel(
     val snackBarText = mutableStateOf("")
 
     @OptIn(ExperimentalStdlibApi::class)
-    fun importWallet() {
+    fun importWallet(navController: NavController) {
         isLoading.value = true
         viewModelScope.launch {
             val wallet = tonWalletUseCase.generateWallet(
@@ -55,11 +57,11 @@ class ImportWalletViewModel(
                 secureStorageRepository.storeUserFriendlyAddress(userFriendlyAddress)
                 secureStorageRepository.storePublicKey(publicKey.hexToByteArray())
                 secureStorageRepository.storePrivateKey(privateKey)
-                initAccount()
+                initAccount(navController)
             } else {
                 snackBarText.value = wallet.error?.message.toString()
+                isLoading.value = false
             }
-            isLoading.value = false
         }
     }
 
@@ -109,7 +111,7 @@ class ImportWalletViewModel(
         return tonWalletUseCase.isWalletPhraseValid(phrase)
     }
 
-    fun initAccount() {
+    fun initAccount(navController: NavController) {
         isLoadingText.value = "Initiating account..."
         isLoading.value = true
         viewModelScope.launch(Dispatchers.IO) {
@@ -127,25 +129,30 @@ class ImportWalletViewModel(
                             if (existStatus.success) {
                                 // User exists, proceed with login or other actions
                                 if (existStatus.result == true) {
-                                    snackBarText.value = "Account exists. Logging in..."
-                                    //    login()
+                                    isLoadingText.value = "Account exists. Logging in..."
+                                    launch(Dispatchers.Main){
+                                        navController.navigate(Screens.HomeScreen.screen){
+                                            popUpTo(Screens.ImportWallet.screen){inclusive = true}
+                                        }
+                                    }
                                 } else {
-                                    snackBarText.value = "Initiating Account..."
+                                    isLoadingText.value = "Initiating Account..."
                                     val newUserStatus = userUseCase.createNewUser()
                                     if (newUserStatus.success) {
-                                        snackBarText.value = "Account created successfully"
-                                        //login()
+                                        launch(Dispatchers.Main){
+                                            navController.navigate(Screens.HomeScreen.screen){
+                                                popUpTo(Screens.ImportWallet.screen){inclusive = true}
+                                            }
+                                        }
                                     } else {
                                         snackBarText.value =
                                             newUserStatus.error?.message ?: "Something went wrong"
                                     }
-
                                 }
                             } else {
                                 isLoading.value = false
                                 snackBarText.value =
                                     existStatus.error?.message ?: "Something went wrong"
-
                             }
                         }.onFailure { it ->
                             snackBarText.value = it.message.toString()

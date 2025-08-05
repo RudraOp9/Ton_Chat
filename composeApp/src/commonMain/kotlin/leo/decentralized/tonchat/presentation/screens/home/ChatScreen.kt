@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -74,7 +75,8 @@ fun ChatScreen(
                 .padding(vertical = 2.dp))
 
         }, postLazyContent = {
-            Box(modifier = Modifier.fillMaxSize()){
+            Box(modifier = Modifier.fillMaxSize().padding(top = 4.dp)
+                .navigationBarsPadding()){
                 val messageTextFieldHeight = rememberSaveable{
                     mutableStateOf(0)
                 }
@@ -82,7 +84,7 @@ fun ChatScreen(
                     mutableStateOf(0)
                 }
 
-                LazyColumn(modifier = Modifier.fillMaxSize().padding(bottom = messageTextFieldHeight.value.dp).padding(horizontal = 8.dp), reverseLayout = true){
+                LazyColumn(modifier = Modifier.fillMaxSize().padding(bottom = with(LocalDensity.current){messageTextFieldHeight.value.toDp()}).padding(horizontal = 8.dp), reverseLayout = true){
                     items(listOfChat.value.size) { index ->
                         ChatBubble(
                             listOfChat.value[index],
@@ -139,9 +141,7 @@ fun ChatScreen(
                 )
 
             }
-        }) {
-            // no lazy layout
-        }
+        })
     }
 }
 

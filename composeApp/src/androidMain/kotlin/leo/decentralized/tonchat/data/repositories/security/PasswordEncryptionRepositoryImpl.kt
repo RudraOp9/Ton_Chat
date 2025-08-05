@@ -15,7 +15,11 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 class PasswordEncryptionRepositoryImpl(private val password: Password): PasswordEncryptionRepository {
 
     private fun generateSecureKey(password: String?): SecretKey {
-        val spec: KeySpec = PBEKeySpec(password?.toCharArray())
+        val salt = "TON_DECENTRALIZED_CHAT".toByteArray()
+        val iterationCount = 65536
+        val keyLength = 256 // AES-256
+
+        val spec: KeySpec = PBEKeySpec(password?.toCharArray(), salt, iterationCount, keyLength)
         val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
         return SecretKeySpec(factory.generateSecret(spec).encoded, "AES")
     }
@@ -25,6 +29,7 @@ class PasswordEncryptionRepositoryImpl(private val password: Password): Password
             val secretKey = generateSecureKey(password.password)
             Effect(true,encryptAES(stringToEncrypt, secretKey.encoded))
         } catch (e: Exception) {
+            e.printStackTrace()
             Effect(false,error = e )
         }
     }
@@ -34,6 +39,7 @@ class PasswordEncryptionRepositoryImpl(private val password: Password): Password
             val secretKey = generateSecureKey(password.password)
             Effect(true,decryptAES(stringToDecrypt, secretKey.encoded))
         } catch (e: Exception) {
+            e.printStackTrace()
             Effect(false,error = e )
         }
     }

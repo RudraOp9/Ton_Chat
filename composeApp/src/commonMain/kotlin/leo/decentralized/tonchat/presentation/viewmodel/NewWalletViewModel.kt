@@ -5,12 +5,14 @@ import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import leo.decentralized.tonchat.data.repositories.security.SecureStorageRepository
 import leo.decentralized.tonchat.domain.usecase.TonWalletUseCase
 import leo.decentralized.tonchat.domain.usecase.UserUseCase
+import leo.decentralized.tonchat.navigation.Screens
 
 @OptIn(ExperimentalStdlibApi::class)
 class NewWalletViewModel(
@@ -53,7 +55,7 @@ class NewWalletViewModel(
         }
     }
 
-    fun canContinue() {
+    fun canContinue(navController: NavController) {
         if (isCopied.value) {
             isLoadingText.value = "Initiating account..."
             isLoading.value = true
@@ -65,12 +67,9 @@ class NewWalletViewModel(
                         signedMsg.result.toString()
                     )
                     if (result.success) {
-                        println("token " + result.result)
                         result.result?.let {
                             secureStorageRepository.storeToken(token = it).onSuccess {
-                                initAccount()
-                                isLoading.value = false
-                                snackBarText.value = "Account created successfully"
+                                initAccount(navController)
                             }.onFailure {it->
                                 snackBarText.value = it.message.toString()
                                 isLoading.value = false
@@ -98,13 +97,20 @@ class NewWalletViewModel(
         }
     }
 
-    suspend fun initAccount() {
+    suspend fun initAccount(navController: NavController) {
+        isLoadingText.value = "Initiating account..."
         val result = userUseCase.createNewUser()
-        if(!result.success){
+        if(result.success){
+            viewModelScope.launch(Dispatchers.Main){
+                navController.navigate(Screens.HomeScreen.screen){
+                    popUpTo(Screens.ImportWallet.screen){inclusive = true}
+                }
+            }
+            snackBarText.value = "Account created successfully"
+        }else{
+            isLoading.value = false
+            isLoadingText.value = ""
             snackBarText.value = result.error?.message?:"Unknown error"
         }
-        isLoading.value = false
-        isLoadingText.value = ""
-        //login()
     }
 }

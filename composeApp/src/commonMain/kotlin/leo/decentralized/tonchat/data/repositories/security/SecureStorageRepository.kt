@@ -18,5 +18,8 @@ interface SecureStorageRepository {
     fun getUserFriendlyAddress(): Result<String>
     fun deleteUserFriendlyAddress(): Result<Boolean>
 
+    fun setLoggedIn(loggedIn: Boolean): Result<Boolean>
+    fun getLoggedIn(): Result<Boolean>
+
 
 }

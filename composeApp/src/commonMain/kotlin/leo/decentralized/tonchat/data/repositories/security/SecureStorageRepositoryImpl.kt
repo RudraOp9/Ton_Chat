@@ -148,4 +148,25 @@ class SecureStorageRepositoryImpl(
         }
     }
 
+    override fun setLoggedIn(loggedIn: Boolean): Result<Boolean> {
+        try {
+            settings.putBoolean("loggedIn", loggedIn).apply {
+                return Result.success(true)
+            }
+        }catch (e: Exception){
+            return Result.failure(e)
+        }
+    }
+
+    override fun getLoggedIn(): Result<Boolean> {
+        try {
+            settings.getBoolean("loggedIn", false).let {
+                return Result.success(it)
+            }
+        }catch (e: Exception){
+            return Result.failure(e)
+        }
+
+    }
+
 }

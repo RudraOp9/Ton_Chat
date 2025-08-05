@@ -20,7 +20,8 @@ class UserUseCase(
                 )
 
             return if (response.success){
-                Effect(true,true)
+                secureStorageRepository.setLoggedIn(true)
+                Effect(success = true, result = true)
             }else{
                 Effect(false, error = response.error?: Exception("Something went wrong"))
             }
@@ -36,6 +37,7 @@ class UserUseCase(
     suspend fun checkUserExist(address:String):Effect<Boolean> {
         val response = userApiRepository.checkUserExist(address)
         return if (response.success){
+            secureStorageRepository.setLoggedIn(true)
             Effect(true,response.result)
         }else{
             Effect(false, error = response.error?: Exception("Something went wrong"))

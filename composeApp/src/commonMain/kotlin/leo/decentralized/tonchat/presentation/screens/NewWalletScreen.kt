@@ -63,7 +63,7 @@ fun NewWalletScreen(
                     Button(onClick = {
                         vm.showBackupAlert.value = false
                         vm.isCopied.value = true
-                        vm.canContinue()
+                        vm.canContinue(navController)
                     }, shape = RoundedCornerShape(40)) {
                         Text("Yes")
                     }
@@ -100,7 +100,7 @@ fun NewWalletScreen(
                                 role = Role.Button
                             ) {
                                 if (vm.isCopied.value) {
-                                    vm.canContinue()
+                                    vm.canContinue(navController)
                                 } else vm.copyPhrases(clipboardManager)
                             }
                             .padding(vertical = 2.dp, horizontal = 8.dp)
@@ -186,7 +186,7 @@ fun NewWalletScreen(
             ) {
                 Button(
                     onClick = {
-                        vm.canContinue()
+                        vm.canContinue(navController)
                     },
                     modifier = Modifier.fillMaxWidth() ,
                     shape = RoundedCornerShape(40)

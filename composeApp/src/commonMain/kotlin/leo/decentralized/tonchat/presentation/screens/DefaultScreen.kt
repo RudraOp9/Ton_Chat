@@ -39,7 +39,7 @@ fun DefaultScreen(
     secondaryButton: @Composable () -> Unit = {},
     postLazyContent: @Composable () -> Unit = {},
     horizontalPadding: Dp = 16.dp,
-    content: LazyListScope.() -> Unit = {},
+    content: (LazyListScope.() -> Unit)? = null,
 ) {
     Column(
         modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface)
@@ -51,13 +51,6 @@ fun DefaultScreen(
                 .background(color = MaterialTheme.colorScheme.surfaceContainer)
 
         ) {
-            println(
-                "window insets : status bar : ${WindowInsets.statusBars.asPaddingValues().calculateTopPadding()}, cutout : ${WindowInsets.displayCutout.asPaddingValues().calculateTopPadding()}, union : ${
-                    WindowInsets.statusBars.union(
-                        WindowInsets.displayCutout
-                    ).asPaddingValues().calculateTopPadding()
-                }"
-            )
             Box(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)
                     .windowInsetsPadding(WindowInsets.statusBars.union(WindowInsets.displayCutout)),
@@ -100,11 +93,13 @@ fun DefaultScreen(
             }
 
         }
-        LazyColumn(
-            modifier = Modifier.padding(horizontal = horizontalPadding).padding(top = 4.dp)
-                .navigationBarsPadding()
-        ) {
-            content()
+        if (content != null) {
+            LazyColumn(
+                modifier = Modifier.padding(horizontal = horizontalPadding).padding(top = 4.dp)
+                    .navigationBarsPadding()
+            ) {
+                content()
+            }
         }
         postLazyContent()
     }

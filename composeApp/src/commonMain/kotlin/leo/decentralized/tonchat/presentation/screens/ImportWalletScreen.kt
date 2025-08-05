@@ -85,7 +85,7 @@ fun ImportWalletScreen(
                         role = Role.Button
                     ) {
                         if (vm.isSecretKeysValid.value) {
-                            vm.importWallet()
+                            vm.importWallet(navController)
                         } else vm.pasteSecretKeys(clipboard)
                     }
                     .padding(vertical = 2.dp)
@@ -248,7 +248,7 @@ fun ImportWalletScreen(
                 Button(
                     enabled = vm.isSecretKeysValid.value,
                     onClick = {
-                        vm.importWallet()
+                        vm.importWallet(navController)
                     },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(40)
