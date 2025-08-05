@@ -33,7 +33,7 @@ val commonModule = module {
     viewModel { ImportWalletViewModel(get(), get(),get(),get(),get()) }
     viewModel { NewWalletViewModel(get(),get(),get()) }
     viewModel { InputPasswordViewModel(get(),get()) }
-    viewModel { ChatViewModel(get()) }
+    viewModel { ChatViewModel(get(),get()) }
     viewModel { SplashScreenViewModel(get()) }
 
     //use cases

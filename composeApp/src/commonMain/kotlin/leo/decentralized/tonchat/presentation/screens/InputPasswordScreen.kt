@@ -87,12 +87,17 @@ fun InputPasswordScreen(navHost: NavHostController, isNew: Boolean, goTo: String
             if (isNew) {
                 if (isConfirming) {
                     if (pinString == firstPin) {
-                        vm.savePassword(vm.enteredPin.value)
-                        navHost.navigate(goTo) {
-                            popUpTo(PassCode(isNew, goTo)) {
-                                inclusive = true
+                        vm.savePassword()
+                        if (goTo != ""){
+                            navHost.navigate(goTo) {
+                                popUpTo(PassCode(isNew, goTo)) {
+                                    inclusive = true
+                                }
                             }
+                        }else{
+                            navHost.popBackStack()
                         }
+
                     } else {
                         isError = true
                         println("PINs do not match. Try again.")
@@ -105,11 +110,16 @@ fun InputPasswordScreen(navHost: NavHostController, isNew: Boolean, goTo: String
                 }
             } else {
                 //validate pin todo : max attempts
-                vm.checkPassAndContinue(vm.enteredPin.value)
+                vm.savePassword()
+                vm.checkPassAndContinue()
                     .onSuccess { // Example: incorrect PIN
                         vm.enteredPin.value = ""
                         firstPin = ""
-                        //todo continue surfing
+                        navHost.navigate(goTo) {
+                            popUpTo(PassCode(isNew, goTo)) {
+                                inclusive = true
+                            }
+                        }
                     }.onFailure {
                         vm.enteredPin.value = ""
                         isError = true

@@ -11,18 +11,17 @@ class InputPasswordViewModel(
 ) : ViewModel() {
     val enteredPin = mutableStateOf("")
 
-    fun checkPassAndContinue(pass: String): Result<Boolean> {
+    fun checkPassAndContinue(): Result<Boolean> {
         val token = secureStorageRepository.getToken()
         return if (token.isSuccess) {
-            savePassword(pass)
             Result.success(true)
         } else {
             Result.failure(Exception("Wrong password"))
         }
     }
 
-    fun savePassword(pass: String) {
-        password.password = pass
+    fun savePassword() {
+        password.password = enteredPin.value
     }
 
 }

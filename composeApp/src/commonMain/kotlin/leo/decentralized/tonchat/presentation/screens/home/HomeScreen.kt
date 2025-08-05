@@ -3,6 +3,7 @@ package leo.decentralized.tonchat.presentation.screens.home
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,12 +14,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.sharp.Search
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
@@ -50,6 +55,11 @@ import org.koin.compose.viewmodel.koinViewModel
 fun HomeScreen(navController: NavController,vm: ChatViewModel = koinViewModel()) {
 
     val snackBarHost = SnackbarHostState()
+
+    LaunchedEffect(Unit){
+        vm.checkPassword(navController)
+    }
+
     LaunchedEffect(vm.snackBarText.value) {
         if (vm.snackBarText.value.isNotEmpty()) {
             snackBarHost.showSnackbar(vm.snackBarText.value)
@@ -86,29 +96,55 @@ fun HomeScreen(navController: NavController,vm: ChatViewModel = koinViewModel())
                     .padding(vertical = 2.dp, horizontal = 8.dp)
             )
         }, postLazyContent = {
-            HorizontalPager(
-                modifier = Modifier.padding(top = 4.dp)
-                    .navigationBarsPadding(),
-                state = rememberPagerState { 2 },
-                beyondViewportPageCount = 1,
-                userScrollEnabled = false,
-                //key = {it},
-                pageContent = {
-                    LazyColumn(
-                        modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainerLow)
-                    )
-                    {
-                        item {
-                            ChatItem(address = "EQlaksdOJkjslaasdfasdfasdfadfasdfasdfassdfasdfasfasdfdjfLK_Address", status = ChatStatus.SECURE, unreadCount = 3){
-                                navController.navigate(Screens.ChatScreen.screen)
+            Box(modifier= Modifier.fillMaxSize()){
+                HorizontalPager(
+                    modifier = Modifier.padding(top = 4.dp)
+                        .navigationBarsPadding(),
+                    state = rememberPagerState { 2 },
+                    beyondViewportPageCount = 1,
+                    userScrollEnabled = false,
+                    //key = {it},
+                    pageContent = {
+                        LazyColumn(
+                            modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainerLow)
+                        )
+                        {
+                            item {
+                                ChatItem(
+                                    address = "EQlaksdOJkjslaasdfasdfasdfadfasdfasdfassdfasdfasfasdfdjfLK_Address",
+                                    status = ChatStatus.SECURE,
+                                    unreadCount = 3
+                                ) {
+                                    navController.navigate(Screens.ChatScreen.screen)
+                                }
+                                ChatItem(
+                                    address = "EQanotherRandomAddressStringValueForTestingPurposeOnlyNowOkThanks",
+                                    status = ChatStatus.UNSECURE,
+                                    unreadCount = 1
+                                ) {}
+                                ChatItem(
+                                    address = "EQshortAddress",
+                                    status = ChatStatus.COMPROMISED,
+                                    unreadCount = 0
+                                ) {}
+                                ChatItem(
+                                    address = "EQanotherVeryLongAddressThatMightOverflowAndNeedsEllipsisChecks",
+                                    status = ChatStatus.VULNERABLE,
+                                    unreadCount = 99
+                                ) {}
                             }
-                            ChatItem(address = "EQanotherRandomAddressStringValueForTestingPurposeOnlyNowOkThanks", status = ChatStatus.UNSECURE, unreadCount = 1){}
-                            ChatItem(address = "EQshortAddress", status = ChatStatus.COMPROMISED, unreadCount = 0){}
-                            ChatItem(address = "EQanotherVeryLongAddressThatMightOverflowAndNeedsEllipsisChecks", status = ChatStatus.VULNERABLE, unreadCount = 99){}
+                            items(vm.contacts.value) {
+                                ChatItem(it.contacts, ChatStatus.UNSECURE, unreadCount = 2) {}
+                            }
                         }
                     }
+                )
+                SmallFloatingActionButton(onClick = {}, modifier = Modifier.align {s,i,l->
+                    Alignment.BottomEnd.align(s,i,l)
+                }.padding(end = 8.dp, bottom = 16.dp).navigationBarsPadding(), shape = CircleShape) {
+                    Icon(Icons.Default.Add, "New contact")
                 }
-            )
+            }
         },
         horizontalPadding = 0.dp
     )
