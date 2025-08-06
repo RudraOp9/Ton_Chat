@@ -1,5 +1,6 @@
 package leo.decentralized.tonchat.presentation.screens.home
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -139,15 +140,25 @@ fun HomeScreen(navController: NavController,vm: ChatViewModel = koinViewModel())
                         }
                     }
                 )
-                SmallFloatingActionButton(onClick = {}, modifier = Modifier.align {s,i,l->
+                SmallFloatingActionButton(onClick = {
+                    vm.newContactScreen.value = true
+                }, modifier = Modifier.align {s,i,l->
                     Alignment.BottomEnd.align(s,i,l)
                 }.padding(end = 8.dp, bottom = 16.dp).navigationBarsPadding(), shape = CircleShape) {
                     Icon(Icons.Default.Add, "New contact")
                 }
             }
+
         },
         horizontalPadding = 0.dp
     )
+    AnimatedVisibility(vm.newContactScreen.value){
+        NewContactSearchScreen({
+            vm.newContactScreen.value = false
+        },{
+            vm.searchAndAddNewContact(it)
+        })
+    }
 }
 
 @Composable

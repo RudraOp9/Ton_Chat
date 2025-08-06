@@ -19,6 +19,7 @@ class ChatViewModel(
     private val password: Password
 ): ViewModel() {
     var contacts = mutableStateOf<List<Contact>>(emptyList())
+    var newContactScreen = mutableStateOf(false)
 
     val isLoadingText = mutableStateOf("")
     val isLoading = mutableStateOf(true)
@@ -40,6 +41,27 @@ class ChatViewModel(
         if (password.password == null){
             navController.navigate(PassCode(false, Screens.HomeScreen.screen)){
                 popUpTo(Screens.HomeScreen.screen){inclusive = true}
+            }
+        }
+    }
+
+    fun searchAndAddNewContact(address:String){
+        viewModelScope.launch(Dispatchers.IO){
+            isLoading.value = true
+            chatUseCase.newContact(address).onSuccess { it ->
+                if (it){
+                    newContactScreen.value = false
+                    chatUseCase.getContacts().onSuccess {contact ->
+                        contacts.value = contact
+                        isLoading.value = false
+                    }.onFailure {
+                        snackBarText.value = it.message.toString()
+                        isLoading.value = false
+                    }
+                }
+            }.onFailure {
+                snackBarText.value = it.message.toString()
+                isLoading.value = false
             }
         }
     }
