@@ -28,6 +28,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -42,25 +43,35 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import leo.decentralized.tonchat.presentation.screens.DefaultScreen
 import leo.decentralized.tonchat.presentation.screens.LoadingScreen
+import leo.decentralized.tonchat.presentation.viewmodel.ChatViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 
 @Composable
 fun ChatScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    address: String,
+    vm: ChatViewModel = koinViewModel()
 ){
-    val snackBarHost = SnackbarHostState()
-    val listOfChat = remember {
-        mutableStateOf(listOf(
-            ChatMessage(message = "Hello", isMine = true ),
-            ChatMessage(message = "Hi there!", isMine = false)
-        ))
+    LaunchedEffect(Unit){
+        vm.getChats(address)
     }
+
+    val snackBarHost = SnackbarHostState()
+
+    LaunchedEffect(vm.snackBarText.value) {
+        if (vm.snackBarText.value.isNotEmpty()) {
+            snackBarHost.showSnackbar(vm.snackBarText.value)
+            vm.snackBarText.value = ""
+        }
+    }
+
     LoadingScreen(
         isLoading = false,
         supportingText = "",
         snackbarHostState = snackBarHost
     ) {
-        DefaultScreen(screenName = "Exlkjfalsdf....n2i", onPrimaryClick = {
+        DefaultScreen(screenName = "${address.take(5)}...${address.takeLast(3)}", onPrimaryClick = {
             navController.popBackStack()
         }, primaryButtonIcon = Icons.AutoMirrored.Sharp.ArrowBack, secondaryButton = {
             Icon(Icons.Default.MoreVert,"",    modifier = Modifier
@@ -85,14 +96,14 @@ fun ChatScreen(
                 }
 
                 LazyColumn(modifier = Modifier.fillMaxSize().padding(bottom = with(LocalDensity.current){messageTextFieldHeight.value.toDp()}).padding(horizontal = 8.dp), reverseLayout = true){
-                    items(listOfChat.value.size) { index ->
+                    items(vm.chatList.value.size) { index ->
                         ChatBubble(
-                            listOfChat.value[index],
+                            vm.chatList.value[index],
                             availableWidth.value,
-                            index < listOfChat.value.size - 1 && listOfChat.value[index].isMine == listOfChat.value[index + 1].isMine,
-                            index > 0 && listOfChat.value[index].isMine == listOfChat.value[index - 1].isMine
+                            index < vm.chatList.value.size - 1 && vm.chatList.value[index].isMine == vm.chatList.value[index + 1].isMine,
+                            index > 0 && vm.chatList.value[index].isMine == vm.chatList.value[index - 1].isMine
                         )
-                        if(index < listOfChat.value.size - 1 && listOfChat.value[index].isMine == listOfChat.value[index + 1].isMine){
+                        if(index < vm.chatList.value.size - 1 && vm.chatList.value[index].isMine == vm.chatList.value[index + 1].isMine){
                             Spacer(modifier = Modifier.height(2.dp))
                         }else {
                             Spacer(modifier = Modifier.height(8.dp))
@@ -123,7 +134,7 @@ fun ChatScreen(
                                 .padding(start = 4.dp)
                                 .clickable {
                                     if (someText.value.isNotBlank()) {
-                                        listOfChat.value = listOfChat.value.toMutableList().apply { add(0,ChatMessage(message = someText.value, isMine = true))}
+                                        vm.chatList.value = vm.chatList.value.toMutableList().apply { add(0,ChatMessage(message = someText.value, isMine = true))}
                                         someText.value = ""
                                     }
                                 })

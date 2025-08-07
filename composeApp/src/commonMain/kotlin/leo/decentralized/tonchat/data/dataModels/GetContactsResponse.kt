@@ -15,6 +15,6 @@ data class GetContactsResponse(
 @Serializable
 data class Contact(
     @SerialName("contacts")
-    val contacts: String
+    val contact: String
 )
 

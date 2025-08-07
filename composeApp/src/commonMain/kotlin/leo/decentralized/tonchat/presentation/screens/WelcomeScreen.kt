@@ -35,7 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import leo.decentralized.tonchat.navigation.PassCode
+import leo.decentralized.tonchat.navigation.Screen
 import leo.decentralized.tonchat.navigation.Screens
 import org.jetbrains.compose.resources.painterResource
 import ton_decentralized_chat.composeapp.generated.resources.Res
@@ -117,7 +117,7 @@ fun WelcomeScreen(navController: NavController) {
             Column {
                 OutlinedButton(
                     onClick = {
-                        navController.navigate(PassCode(true,Screens.ImportWallet.screen))
+                        navController.navigate(Screen.PassCode(true, Screens.ImportWallet.screen))
                     },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(40),
@@ -126,7 +126,7 @@ fun WelcomeScreen(navController: NavController) {
                 }
                 Button(
                     onClick = {
-                        navController.navigate(PassCode(true,Screens.NewWallet.screen))
+                        navController.navigate(Screen.PassCode(true, Screens.NewWallet.screen))
                     },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(40),

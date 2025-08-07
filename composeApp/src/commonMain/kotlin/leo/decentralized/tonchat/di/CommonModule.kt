@@ -10,7 +10,6 @@ import leo.decentralized.tonchat.data.repositories.network.userApi.UserApiReposi
 import leo.decentralized.tonchat.data.repositories.getSettings
 import leo.decentralized.tonchat.data.repositories.network.chatApi.ChatApiRepository
 import leo.decentralized.tonchat.data.repositories.network.chatApi.ChatApiRepositoryImpl
-import leo.decentralized.tonchat.data.repositories.network.tonChatApi.TonChatApiRepository
 import leo.decentralized.tonchat.data.repositories.security.SecurePrivateExecutionAndStorageRepository
 import leo.decentralized.tonchat.data.repositories.security.securePrivateExecutionAndStorageRepositoryImpl
 import leo.decentralized.tonchat.domain.usecase.ChatUseCase
@@ -18,6 +17,7 @@ import leo.decentralized.tonchat.domain.usecase.FormatStringUseCase
 import leo.decentralized.tonchat.domain.usecase.TonWalletUseCase
 import leo.decentralized.tonchat.domain.usecase.UserUseCase
 import leo.decentralized.tonchat.presentation.viewmodel.ChatViewModel
+import leo.decentralized.tonchat.presentation.viewmodel.HomeViewModel
 import leo.decentralized.tonchat.presentation.viewmodel.ImportWalletViewModel
 import leo.decentralized.tonchat.presentation.viewmodel.InputPasswordViewModel
 import leo.decentralized.tonchat.presentation.viewmodel.NewWalletViewModel
@@ -33,8 +33,9 @@ val commonModule = module {
     viewModel { ImportWalletViewModel(get(), get(),get(),get(),get()) }
     viewModel { NewWalletViewModel(get(),get(),get()) }
     viewModel { InputPasswordViewModel(get(),get()) }
-    viewModel { ChatViewModel(get(),get()) }
+    viewModel { HomeViewModel(get(),get()) }
     viewModel { SplashScreenViewModel(get()) }
+    viewModel { ChatViewModel(get()) }
 
     //use cases
     factory { TonWalletUseCase(get(),get()) }

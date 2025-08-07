@@ -49,7 +49,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import leo.decentralized.tonchat.navigation.PassCode
+import leo.decentralized.tonchat.navigation.Screen
 import leo.decentralized.tonchat.presentation.viewmodel.InputPasswordViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -90,7 +90,7 @@ fun InputPasswordScreen(navHost: NavHostController, isNew: Boolean, goTo: String
                         vm.savePassword()
                         if (goTo != ""){
                             navHost.navigate(goTo) {
-                                popUpTo(PassCode(isNew, goTo)) {
+                                popUpTo(Screen.PassCode(isNew, goTo)) {
                                     inclusive = true
                                 }
                             }
@@ -116,7 +116,7 @@ fun InputPasswordScreen(navHost: NavHostController, isNew: Boolean, goTo: String
                         vm.enteredPin.value = ""
                         firstPin = ""
                         navHost.navigate(goTo) {
-                            popUpTo(PassCode(isNew, goTo)) {
+                            popUpTo(Screen.PassCode(isNew, goTo)) {
                                 inclusive = true
                             }
                         }

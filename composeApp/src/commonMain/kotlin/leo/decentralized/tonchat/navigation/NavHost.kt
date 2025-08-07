@@ -5,13 +5,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import androidx.navigation.toRoute
-import androidx.savedstate.read
 import leo.decentralized.tonchat.presentation.screens.ImportWalletScreen
 import leo.decentralized.tonchat.presentation.screens.InputPasswordScreen
 import leo.decentralized.tonchat.presentation.screens.NewWalletScreen
@@ -36,8 +33,8 @@ fun NavHost(defaultScreen:String) {
             WelcomeScreen(navHostController)
         }
 
-        composable<PassCode> {
-            val passCode = it.toRoute<PassCode>()
+        composable<Screen.PassCode> {
+            val passCode = it.toRoute<Screen.PassCode>()
             InputPasswordScreen(navHostController,passCode.isNew,passCode.goTo)
         }
 
@@ -55,8 +52,9 @@ fun NavHost(defaultScreen:String) {
             HomeScreen(navHostController)
         }
 
-        composable (Screens.ChatScreen.screen ){
-            ChatScreen(navHostController)
+        composable <Screen.ChatScreen>{
+            val chatScreen = it.toRoute<Screen.ChatScreen>()
+            ChatScreen(navController = navHostController,address = chatScreen.address)
         }
 
 

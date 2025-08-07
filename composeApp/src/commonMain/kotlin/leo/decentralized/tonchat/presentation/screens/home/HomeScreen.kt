@@ -41,21 +41,22 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import leo.decentralized.tonchat.navigation.Screens
+import leo.decentralized.tonchat.navigation.Screen
 import leo.decentralized.tonchat.presentation.screens.DefaultScreen
 import leo.decentralized.tonchat.presentation.screens.LoadingScreen
-import leo.decentralized.tonchat.presentation.viewmodel.ChatViewModel
+import leo.decentralized.tonchat.presentation.viewmodel.HomeViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun HomeScreen(navController: NavController,vm: ChatViewModel = koinViewModel()) {
+fun HomeScreen(navController: NavController,vm: HomeViewModel = koinViewModel()) {
 
-    val snackBarHost = SnackbarHostState()
+    val snackBarHost = remember{
+        SnackbarHostState()
+    }
 
     LaunchedEffect(Unit){
         vm.checkPassword(navController)
@@ -72,86 +73,71 @@ fun HomeScreen(navController: NavController,vm: ChatViewModel = koinViewModel())
         isLoading = vm.isLoading.value,
         supportingText = vm.isLoadingText.value,
         snackbarHostState = snackBarHost
-    ){
+    ) {
+        DefaultScreen(
+            screenName = "Decentralized ton chat",
+            onPrimaryClick = {},
+            primaryButtonIcon = Icons.Sharp.Search,
+            secondaryButton = {
+                Text(
+                    text = "Settings",
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.titleSmall,
+                    modifier = Modifier
+                        .padding(/*vertical = 8.dp,*/ horizontal = 4.dp)
+                        .clickable(
+                            interactionSource = null,
+                            indication = ripple(color = MaterialTheme.colorScheme.primary),
+                            role = Role.Button
+                        ) {
 
-    }
-    DefaultScreen(
-        screenName = "Decentralized ton chat",
-        onPrimaryClick = {},
-        primaryButtonIcon = Icons.Sharp.Search,
-        secondaryButton = {
-            Text(
-                text = "Settings",
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.titleSmall,
-                modifier = Modifier
-                    .padding(/*vertical = 8.dp,*/ horizontal = 4.dp)
-                    .clickable(
-                        interactionSource = null,
-                        indication = ripple(color = MaterialTheme.colorScheme.primary),
-                        role = Role.Button
-                    ) {
-
-                    }
-                    .padding(vertical = 2.dp, horizontal = 8.dp)
-            )
-        }, postLazyContent = {
-            Box(modifier= Modifier.fillMaxSize()){
-                HorizontalPager(
-                    modifier = Modifier.padding(top = 4.dp)
-                        .navigationBarsPadding(),
-                    state = rememberPagerState { 2 },
-                    beyondViewportPageCount = 1,
-                    userScrollEnabled = false,
-                    //key = {it},
-                    pageContent = {
-                        LazyColumn(
-                            modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainerLow)
-                        )
-                        {
-                            item {
-                                ChatItem(
-                                    address = "EQlaksdOJkjslaasdfasdfasdfadfasdfasdfassdfasdfasfasdfdjfLK_Address",
-                                    status = ChatStatus.SECURE,
-                                    unreadCount = 3
-                                ) {
-                                    navController.navigate(Screens.ChatScreen.screen)
+                        }
+                        .padding(vertical = 2.dp, horizontal = 8.dp)
+                )
+            }, postLazyContent = {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    HorizontalPager(
+                        modifier = Modifier.padding(top = 4.dp)
+                            .navigationBarsPadding(),
+                        state = rememberPagerState { 2 },
+                        beyondViewportPageCount = 1,
+                        userScrollEnabled = false,
+                        //key = {it},
+                        pageContent = {
+                            LazyColumn(
+                                modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainerLow)
+                            )
+                            {
+                                items(vm.contacts.value) {
+                                    ChatItem(
+                                        it.contact,
+                                        ChatStatus.UNKNOWN,
+                                        unreadCount = 0
+                                    ) { //TODO
+                                        navController.navigate(Screen.ChatScreen(it.contact))
+                                    }
                                 }
-                                ChatItem(
-                                    address = "EQanotherRandomAddressStringValueForTestingPurposeOnlyNowOkThanks",
-                                    status = ChatStatus.UNSECURE,
-                                    unreadCount = 1
-                                ) {}
-                                ChatItem(
-                                    address = "EQshortAddress",
-                                    status = ChatStatus.COMPROMISED,
-                                    unreadCount = 0
-                                ) {}
-                                ChatItem(
-                                    address = "EQanotherVeryLongAddressThatMightOverflowAndNeedsEllipsisChecks",
-                                    status = ChatStatus.VULNERABLE,
-                                    unreadCount = 99
-                                ) {}
-                            }
-                            items(vm.contacts.value) {
-                                ChatItem(it.contacts, ChatStatus.UNSECURE, unreadCount = 2) {}
                             }
                         }
+                    )
+                    SmallFloatingActionButton(
+                        onClick = {
+                            vm.newContactScreen.value = true
+                        },
+                        modifier = Modifier.align { s, i, l ->
+                            Alignment.BottomEnd.align(s, i, l)
+                        }.padding(end = 8.dp, bottom = 16.dp).navigationBarsPadding(),
+                        shape = CircleShape
+                    ) {
+                        Icon(Icons.Default.Add, "New contact")
                     }
-                )
-                SmallFloatingActionButton(onClick = {
-                    vm.newContactScreen.value = true
-                }, modifier = Modifier.align {s,i,l->
-                    Alignment.BottomEnd.align(s,i,l)
-                }.padding(end = 8.dp, bottom = 16.dp).navigationBarsPadding(), shape = CircleShape) {
-                    Icon(Icons.Default.Add, "New contact")
                 }
-            }
 
-        },
-        horizontalPadding = 0.dp
-    )
+            },
+            horizontalPadding = 0.dp
+        )
+    }
     AnimatedVisibility(vm.newContactScreen.value){
         NewContactSearchScreen({
             vm.newContactScreen.value = false
@@ -209,6 +195,10 @@ fun ChatItem(
                                 withStyle(style = SpanStyle(color = Color(0xFFFFA500).copy(alpha = 0.8f))) {
                                     this.append(status.name.lowercase())
                                 }}
+                            ChatStatus.UNKNOWN -> {
+                                withStyle(style = SpanStyle(color = Color.Gray.copy(alpha = 0.8f))) {
+                                    this.append(status.name.lowercase())
+                                }}
                         }
 
                         // todo if(secure) else if(breached) else if(unprotected)
@@ -246,7 +236,7 @@ fun ChatItem(
 }
 
 enum class ChatStatus {
-    SECURE, UNSECURE, COMPROMISED, VULNERABLE
+    SECURE, UNSECURE, COMPROMISED, VULNERABLE, UNKNOWN
 }
 
 //todo checking the secure status of the user using password/pin : server sends an iv to user which will be encrypted using AES with the pin, and encrypted message will be sent to server, on each instance ( app open ) user has to encrypt the same iv using pass and send to server to allow sending the data present in cloud, in case of wrong three pin account will be marked unsecure.
