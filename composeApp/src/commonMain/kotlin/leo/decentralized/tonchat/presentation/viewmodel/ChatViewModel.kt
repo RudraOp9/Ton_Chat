@@ -15,8 +15,10 @@ class ChatViewModel(
     var shimmer = mutableStateOf(true)
     var chatList = mutableStateOf(listOf<ChatMessage>())
     var snackBarText = mutableStateOf("")
+    var chatAddress = ""
 
     fun getChats(address: String) {
+        chatAddress = address
         viewModelScope.launch(Dispatchers.IO) {
             chatUseCase.getChatFor(address).onSuccess {
                 chatList.value  = it // todo paging
@@ -28,9 +30,16 @@ class ChatViewModel(
         }
     }
 
-    fun sendMessage(){
-
+    fun sendMessage(message: String){
+        viewModelScope.launch(Dispatchers.IO) {
+            chatList.value = chatList.value.toMutableList().apply {
+                add(0, ChatMessage(message,true))
+            }
+            chatUseCase.sendMessage(message = message, to = chatAddress).onSuccess {
+             //todo handle remove sending icon
+            }.onFailure {
+                //todo handle add failure icon
+            }
+        }
     }
-
-
 }

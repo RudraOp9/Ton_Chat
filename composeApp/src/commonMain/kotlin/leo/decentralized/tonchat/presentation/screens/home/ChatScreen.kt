@@ -134,7 +134,7 @@ fun ChatScreen(
                                 .padding(start = 4.dp)
                                 .clickable {
                                     if (someText.value.isNotBlank()) {
-                                        vm.chatList.value = vm.chatList.value.toMutableList().apply { add(0,ChatMessage(message = someText.value, isMine = true))}
+                                        vm.sendMessage(someText.value)
                                         someText.value = ""
                                     }
                                 })

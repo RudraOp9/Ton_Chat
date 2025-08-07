@@ -69,20 +69,20 @@ kotlin {
 
             // implementation("org.ton:ton-kotlin:0.2.18")
             implementation(libs.bundles.ktor)
-            implementation("org.ton:ton-kotlin-crypto:0.4.3")
-            implementation("com.russhwolf:multiplatform-settings:1.3.0")
+            implementation(libs.ton.ton.kotlin.crypto)
+            implementation(libs.multiplatform.settings)
 
             implementation(libs.navigation.compose)
 
-            implementation("io.github.theapache64:rebugger:1.0.0-rc03")
+            implementation(libs.rebugger)
 
 
 
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
-            implementation("org.ton:ton-kotlin-crypto:0.4.3")
-            implementation("org.ton:ton-kotlin-contract:0.4.3")
+            implementation(libs.ton.ton.kotlin.crypto)
+            implementation(libs.ton.kotlin.contract)
 
             // implementation(libs.bundles.ktor)
         }

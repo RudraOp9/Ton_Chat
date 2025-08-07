@@ -53,7 +53,12 @@ class ChatUseCase(
         }
     }
 
-    suspend fun sendMessage(message:String){
-        
+    suspend fun sendMessage(message:String, to:String): Result<Long>{
+        val result = chatApi.sendMessage(message = message, to = to)
+        return if (result.success) {
+            Result.success(result.result?.time?:0L)
+        } else {
+            Result.failure(result.error ?: Exception("Unknown error"))
+        }
     }
 }
