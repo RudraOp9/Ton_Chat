@@ -53,7 +53,6 @@ class TonWalletUseCase(
         } catch (e: Exception) {
             return Effect(false, error = e)
         }
-
     }
 
     @OptIn(ExperimentalStdlibApi::class)

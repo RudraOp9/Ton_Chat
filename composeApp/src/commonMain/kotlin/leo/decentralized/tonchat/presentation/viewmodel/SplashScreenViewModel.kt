@@ -7,7 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import leo.decentralized.tonchat.data.repositories.security.SecureStorageRepository
-import leo.decentralized.tonchat.navigation.Screens
+import leo.decentralized.tonchat.presentation.navigation.Screens
 
 class SplashScreenViewModel(secureStorageRepository: SecureStorageRepository) : ViewModel() {
     val isLoading = mutableStateOf(true)

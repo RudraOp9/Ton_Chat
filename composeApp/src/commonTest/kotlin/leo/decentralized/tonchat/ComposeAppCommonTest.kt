@@ -2,17 +2,15 @@ package leo.decentralized.tonchat
 
 
 import io.ktor.util.hex
+import io.ktor.utils.io.core.String
 import io.ktor.utils.io.core.toByteArray
-import kotlinx.io.Buffer
 import kotlinx.io.bytestring.toHexString
-import kotlinx.io.readString
 import org.ton.api.pk.PrivateKeyEd25519
-import org.ton.contract.wallet.WalletV3R2Contract
-import org.ton.contract.wallet.WalletV4R2Contract
-import org.ton.crypto.DecryptorEd25519
+import org.ton.api.pub.PublicKeyEd25519
 import org.ton.crypto.Ed25519
-import org.ton.crypto.Ed25519.publicKey
+import org.ton.crypto.EncryptorEd25519
 import org.ton.mnemonic.Mnemonic
+import kotlin.collections.toByteArray
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -33,7 +31,7 @@ class ComposeAppCommonTest {
                 .splitToSequence(" ").toList()).toSeed()
 
         val privateHex  = hex(keyArray)
-        val publicKey = publicKey(keyArray.slice(32..63).toByteArray())
+        val publicKey = Ed25519.publicKey(keyArray.slice(32..63).toByteArray())
         val publicKey1 = keyArray.slice(32..63).toByteArray()
         val hexAddr = hex(publicKey)
 
@@ -78,6 +76,47 @@ class ComposeAppCommonTest {
                 println("address : "+address.joinToString())*/
 
         assertEquals(3, 1 + 2)
+    }
+
+    @OptIn(ExperimentalStdlibApi::class)
+    @Test
+    fun encryptDecryptTest(){
+        val keyArray =
+            Mnemonic(("silent huge hazard believe bid outer hockey record smooth maple popular cool stairs myth tired inquiry believe awake ketchup horror viable clay divide average")
+                .splitToSequence(" ").toList()).toSeed()
+        val keyArray2 =
+            Mnemonic(("blue include vital scheme found cactus accuse since animal noble recycle culture general latin wrap super sword episode lawsuit tunnel supply obtain harsh worth")
+                .splitToSequence(" ").toList()).toSeed() //EQBg3rlccFWUaG1fHt_WLhFxsVvUn_136dIznbQfVm8k79dh
+        val privateKey = keyArray.slice(0..31).toByteArray()
+        val publicKey = Ed25519.publicKey(privateKey)
+
+        val privateKey2 = keyArray2.slice(0..31).toByteArray()
+        val publicKey2 = Ed25519.publicKey(privateKey2)
+
+        val sharedKey =  PrivateKeyEd25519(privateKey).sharedKey(PublicKeyEd25519(publicKey2))
+        val shareKey2 = PrivateKeyEd25519(privateKey2).sharedKey(PublicKeyEd25519(publicKey))
+
+        val sharedPrivateKey = PrivateKeyEd25519(PrivateKeyEd25519(privateKey).sharedKey(PublicKeyEd25519(publicKey2)))
+        val sharedPrivateKey2 = PrivateKeyEd25519(PrivateKeyEd25519(privateKey2).sharedKey(PublicKeyEd25519(publicKey)))
+
+        val encryptedMsg = hex(sharedPrivateKey.publicKey().encrypt("test".toByteArray()))
+        val decryptedMsg = sharedPrivateKey2.decrypt(hex(encryptedMsg))
+
+        println("""
+            privateKey = ${hex(privateKey)}
+            publicKey = ${hex(publicKey)}
+            privateKey2 = ${hex(privateKey2)}
+            publicKey2 = ${hex(publicKey2)}
+            sharedKey = ${hex(sharedKey)}
+            shareKey2 = ${hex(shareKey2)}
+            encryptedMsg = $encryptedMsg
+            decryptedMsg = ${decryptedMsg.decodeToString()}
+        """.trimIndent())
+
+        assertEquals(hex(sharedKey),hex(shareKey2))
+        assertEquals("test",decryptedMsg.decodeToString())
+
+
     }
 
 }

@@ -51,10 +51,11 @@ import org.koin.compose.viewmodel.koinViewModel
 fun ChatScreen(
     navController: NavHostController,
     address: String,
+    contactPublicAddress: String,
     vm: ChatViewModel = koinViewModel()
 ){
     LaunchedEffect(Unit){
-        vm.getChats(address)
+        vm.getChats(address = address,contactPublicAddress = contactPublicAddress)
     }
 
     val snackBarHost = SnackbarHostState()
@@ -134,7 +135,7 @@ fun ChatScreen(
                                 .padding(start = 4.dp)
                                 .clickable {
                                     if (someText.value.isNotBlank()) {
-                                        vm.sendMessage(someText.value)
+                                        vm.sendMessage(someText.value, contactPublicAddress)
                                         someText.value = ""
                                     }
                                 })

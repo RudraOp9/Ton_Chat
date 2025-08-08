@@ -45,7 +45,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import leo.decentralized.tonchat.navigation.Screen
+import leo.decentralized.tonchat.presentation.navigation.Screen
 import leo.decentralized.tonchat.presentation.screens.DefaultScreen
 import leo.decentralized.tonchat.presentation.screens.LoadingScreen
 import leo.decentralized.tonchat.presentation.viewmodel.HomeViewModel
@@ -107,15 +107,14 @@ fun HomeScreen(navController: NavController,vm: HomeViewModel = koinViewModel())
                         pageContent = {
                             LazyColumn(
                                 modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainerLow)
-                            )
-                            {
+                            ) {
                                 items(vm.contacts.value) {
                                     ChatItem(
-                                        it.contact,
+                                        it.address,
                                         ChatStatus.UNKNOWN,
                                         unreadCount = 0
                                     ) { //TODO
-                                        navController.navigate(Screen.ChatScreen(it.contact))
+                                        navController.navigate(Screen.ChatScreen(it.address,it.publicKey))
                                     }
                                 }
                             }

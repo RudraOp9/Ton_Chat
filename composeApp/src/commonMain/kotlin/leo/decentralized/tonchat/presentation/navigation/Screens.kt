@@ -1,4 +1,4 @@
-package leo.decentralized.tonchat.navigation
+package leo.decentralized.tonchat.presentation.navigation
 
 import androidx.compose.runtime.Immutable
 import kotlinx.serialization.Serializable
@@ -15,7 +15,7 @@ enum class Screens(val screen: String) {
 //interface Screen
 sealed class Screen{
     @Serializable
-    data class ChatScreen(val address:String):Screen()
+    data class ChatScreen(val address:String, val contactPublicAddress: String):Screen()
     @Serializable
     data class PassCode(val isNew: Boolean, val goTo: String):Screen()
 }

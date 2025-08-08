@@ -1,12 +1,17 @@
 package leo.decentralized.tonchat.data.repositories.security
 
-@Deprecated("Can't save ed25519 in keystore")
 interface SecurePrivateExecutionAndStorageRepository {
-    suspend fun storePrivateKey(privateKey: ByteArray, publicKey: ByteArray,pass:String): Result<Boolean>
-    fun deletePrivateKey(pass:String): Result<Boolean>
-    fun signMessage(message: String,pass:String): Result<ByteArray>
-    fun verifySignature(signature: ByteArray, message: String, publicKey: ByteArray,pass:String): Result<Boolean>
-    fun getPublicKey(pass:String): Result<ByteArray>
-    fun encryptMessage(message: String,pass:String): Result<String>
-    fun decryptMessage(encryptedMessage: String,pass:String): Result<String>
+    @Deprecated("Can't save ed25519 in keystore")
+    suspend fun storePrivateKey(privateKey: ByteArray, publicKey: ByteArray,): Result<Boolean>
+    @Deprecated("Can't save ed25519 in keystore")
+    fun deletePrivateKey(): Result<Boolean>
+    @Deprecated("Can't save ed25519 in keystore")
+    fun signMessage(message: String): Result<ByteArray>
+    @Deprecated("Can't save ed25519 in keystore")
+    fun verifySignature(signature: ByteArray, message: String, publicKey: ByteArray,): Result<Boolean>
+    @Deprecated("Can't save ed25519 in keystore")
+    fun getPublicKey(): Result<ByteArray>
+    fun encryptMessage(message: String,contactPublicKey: ByteArray): Result<String>
+    fun decryptMessage(encryptedMessage: String,contactPublicKey: ByteArray): Result<String>
+    fun generateSharedKey(contactPublicKey: ByteArray): Result<ByteArray>
 }

@@ -10,8 +10,8 @@ import kotlinx.coroutines.launch
 import leo.decentralized.tonchat.data.dataModels.Contact
 import leo.decentralized.tonchat.data.dataModels.Password
 import leo.decentralized.tonchat.domain.usecase.ChatUseCase
-import leo.decentralized.tonchat.navigation.Screen
-import leo.decentralized.tonchat.navigation.Screens
+import leo.decentralized.tonchat.presentation.navigation.Screen
+import leo.decentralized.tonchat.presentation.navigation.Screens
 
 class HomeViewModel(
     private val chatUseCase: ChatUseCase,

@@ -1,35 +1,29 @@
 package leo.decentralized.tonchat
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import io.ktor.util.hex
+import io.ktor.utils.io.core.toByteArray
 import leo.decentralized.tonchat.di.appModule
-import leo.decentralized.tonchat.navigation.NavHost
-import leo.decentralized.tonchat.navigation.Screens
-import leo.decentralized.tonchat.presentation.screens.ImportWalletScreen
-import leo.decentralized.tonchat.presentation.screens.NewWalletScreen
-import leo.decentralized.tonchat.presentation.screens.home.HomeScreen
+import leo.decentralized.tonchat.presentation.navigation.NavHost
 import leo.decentralized.tonchat.presentation.theme.TonDecentralizedChatTheme
 import leo.decentralized.tonchat.presentation.viewmodel.SplashScreenViewModel
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinApplication
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.dsl.KoinAppDeclaration
-import ton_decentralized_chat.composeapp.generated.resources.Res
-import ton_decentralized_chat.composeapp.generated.resources.compose_multiplatform
+import org.ton.api.pk.PrivateKeyEd25519
+import org.ton.api.pub.PublicKeyEd25519
+import org.ton.crypto.Ed25519
+import org.ton.mnemonic.Mnemonic
 
 @Composable
-@Preview
 fun App(koinAppDeclaration: KoinAppDeclaration? = null, discardSplashScreen: () -> Unit) {
     KoinApplication(
         application = remember {{
@@ -54,5 +48,54 @@ fun App(koinAppDeclaration: KoinAppDeclaration? = null, discardSplashScreen: () 
                 }
             }
         }
+    }
+}
+
+
+
+@Composable
+@Preview
+fun LOL() {
+    val btText = rememberSaveable{
+        mutableStateOf("click")
+    }
+    Button({
+
+        val keyArray =
+            Mnemonic(("silent huge hazard believe bid outer hockey record smooth maple popular cool stairs myth tired inquiry believe awake ketchup horror viable clay divide average")
+                .splitToSequence(" ").toList()).toSeed()
+        val keyArray2 =
+            Mnemonic(("blue include vital scheme found cactus accuse since animal noble recycle culture general latin wrap super sword episode lawsuit tunnel supply obtain harsh worth")
+                .splitToSequence(" ").toList()).toSeed() //EQBg3rlccFWUaG1fHt_WLhFxsVvUn_136dIznbQfVm8k79dh
+        val privateKey = keyArray.slice(0..31).toByteArray()
+        val publicKey = Ed25519.publicKey(privateKey)
+
+        val privateKey2 = keyArray2.slice(0..31).toByteArray()
+        val publicKey2 = Ed25519.publicKey(privateKey2)
+
+        val sharedKey =  PrivateKeyEd25519(privateKey).sharedKey(PublicKeyEd25519(publicKey2))
+        val shareKey2 = PrivateKeyEd25519(privateKey2).sharedKey(PublicKeyEd25519(publicKey))
+
+        val sharedPrivateKey = PrivateKeyEd25519(PrivateKeyEd25519(privateKey).sharedKey(PublicKeyEd25519(publicKey2)))
+        val sharedPrivateKey2 = PrivateKeyEd25519(PrivateKeyEd25519(privateKey2).sharedKey(PublicKeyEd25519(publicKey)))
+
+        val encryptedMsg = hex(sharedPrivateKey.publicKey().encrypt("test".toByteArray()))
+        val decryptedMsg = sharedPrivateKey2.decrypt(hex(encryptedMsg))
+
+        val text = """
+ privateKey = ${hex(privateKey)}
+            publicKey = ${hex(publicKey)}
+            privateKey2 = ${hex(privateKey2)}
+            publicKey2 = ${hex(publicKey2)}
+            sharedKey = ${hex(sharedKey)}
+            shareKey2 = ${hex(shareKey2)}
+            encryptedMsg = $encryptedMsg
+            decryptedMsg = ${decryptedMsg.decodeToString()}
+        """.trimIndent()
+        btText.value = text
+
+    }, modifier = Modifier.fillMaxSize()){
+        Text(btText.value)
+
     }
 }

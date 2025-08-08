@@ -35,8 +35,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import leo.decentralized.tonchat.navigation.Screen
-import leo.decentralized.tonchat.navigation.Screens
+import leo.decentralized.tonchat.presentation.navigation.Screen
+import leo.decentralized.tonchat.presentation.navigation.Screens
 import org.jetbrains.compose.resources.painterResource
 import ton_decentralized_chat.composeapp.generated.resources.Res
 import ton_decentralized_chat.composeapp.generated.resources.welcome_desktop

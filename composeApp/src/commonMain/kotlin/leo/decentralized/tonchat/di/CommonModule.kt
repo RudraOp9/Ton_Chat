@@ -10,8 +10,6 @@ import leo.decentralized.tonchat.data.repositories.network.userApi.UserApiReposi
 import leo.decentralized.tonchat.data.repositories.getSettings
 import leo.decentralized.tonchat.data.repositories.network.chatApi.ChatApiRepository
 import leo.decentralized.tonchat.data.repositories.network.chatApi.ChatApiRepositoryImpl
-import leo.decentralized.tonchat.data.repositories.security.SecurePrivateExecutionAndStorageRepository
-import leo.decentralized.tonchat.data.repositories.security.securePrivateExecutionAndStorageRepositoryImpl
 import leo.decentralized.tonchat.domain.usecase.ChatUseCase
 import leo.decentralized.tonchat.domain.usecase.FormatStringUseCase
 import leo.decentralized.tonchat.domain.usecase.TonWalletUseCase
@@ -41,7 +39,7 @@ val commonModule = module {
     factory { TonWalletUseCase(get(),get()) }
     factory { FormatStringUseCase() }
     factory { UserUseCase(get(),get()) }
-    factory { ChatUseCase(get(), get()) }
+    factory { ChatUseCase(get(), get(),get()) }
 
     single { createHttpClient(get()) }
     single { httpClientEngine() }
@@ -54,9 +52,6 @@ val commonModule = module {
         getSettings(getKoin()) }
     single <SecureStorageRepository> {
         SecureStorageRepositoryImpl(get(),get()) }
-    single <SecurePrivateExecutionAndStorageRepository>{
-        securePrivateExecutionAndStorageRepositoryImpl()
-    }
     single <ChatApiRepository>{
         ChatApiRepositoryImpl(get(),get()) }
     single <Password> {

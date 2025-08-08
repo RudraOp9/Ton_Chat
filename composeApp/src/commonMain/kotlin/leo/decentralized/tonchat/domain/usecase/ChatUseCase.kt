@@ -1,13 +1,17 @@
 package leo.decentralized.tonchat.domain.usecase
 
+import io.ktor.util.hex
+import io.ktor.utils.io.core.toByteArray
 import leo.decentralized.tonchat.data.dataModels.Contact
 import leo.decentralized.tonchat.data.repositories.network.chatApi.ChatApiRepository
+import leo.decentralized.tonchat.data.repositories.security.SecurePrivateExecutionAndStorageRepository
 import leo.decentralized.tonchat.data.repositories.security.SecureStorageRepository
 import leo.decentralized.tonchat.presentation.screens.home.ChatMessage
 
 class ChatUseCase(
     private val chatApi: ChatApiRepository,
-    private val secureStorage: SecureStorageRepository
+    private val secureStorage: SecureStorageRepository,
+    private val securePrivateExecutionAndStorage: SecurePrivateExecutionAndStorageRepository,
 ) {
     suspend fun getContacts(): Result<List<Contact>> {
         val result = chatApi.getContacts()
@@ -27,7 +31,8 @@ class ChatUseCase(
         }
     }
 
-    suspend fun getChatFor(address: String): Result<List<ChatMessage>> {
+    suspend fun getChatFor(address: String,contactPublicAddress:String,onNewMessage: (Result<ChatMessage>) -> Unit): Result<Unit> {
+        println("contactPublicAddress : $contactPublicAddress")
         try {
             val result = chatApi.getChatFor(address)
             val myAddress = secureStorage.getUserFriendlyAddress().getOrThrow()
@@ -35,16 +40,19 @@ class ChatUseCase(
                 val listOfChats: MutableList<ChatMessage> = mutableListOf()
                 listOfChats.apply {
                     result.result?.chats?.let { chats ->
-                        addAll(
-                            chats.sortedBy { sortedChat ->
-                                sortedChat.time
-                            }.map { mapEntry ->
-                                ChatMessage(mapEntry.message, mapEntry.by == myAddress)
+                        chats.forEach { mapEntry ->
+                            securePrivateExecutionAndStorage.decryptMessage(
+                                mapEntry.message,
+                                hex(contactPublicAddress)
+                            ).onSuccess {
+                                onNewMessage(Result.success(ChatMessage(it,mapEntry.by == myAddress)))
+                            }.onFailure {
+                                onNewMessage(Result.failure(it))
                             }
-                        )
+                        }
                     }
                 }
-                return Result.success(listOfChats)
+                return Result.success(Unit)
             } else {
                 return Result.failure(result.error ?: Exception("Unknown error"))
             }
@@ -53,8 +61,14 @@ class ChatUseCase(
         }
     }
 
-    suspend fun sendMessage(message:String, to:String): Result<Long>{
-        val result = chatApi.sendMessage(message = message, to = to)
+    suspend fun sendMessage(message:String, to:String, contactPublicAddress: String): Result<Long>{
+        val encryptedMessage = securePrivateExecutionAndStorage.encryptMessage(
+            message = message,
+            contactPublicKey = hex(contactPublicAddress)
+        ).getOrElse {
+            return Result.failure(it)
+        }
+        val result = chatApi.sendMessage(message = encryptedMessage, to = to)
         return if (result.success) {
             Result.success(result.result?.time?:0L)
         } else {

@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Backspace
 import androidx.compose.material3.Icon
@@ -49,7 +48,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import leo.decentralized.tonchat.navigation.Screen
+import leo.decentralized.tonchat.presentation.navigation.Screen
 import leo.decentralized.tonchat.presentation.viewmodel.InputPasswordViewModel
 import org.koin.compose.viewmodel.koinViewModel
 

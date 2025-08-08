@@ -70,6 +70,7 @@ kotlin {
             // implementation("org.ton:ton-kotlin:0.2.18")
             implementation(libs.bundles.ktor)
             implementation(libs.ton.ton.kotlin.crypto)
+            implementation(libs.ton.kotlin.contract)
             implementation(libs.multiplatform.settings)
 
             implementation(libs.navigation.compose)

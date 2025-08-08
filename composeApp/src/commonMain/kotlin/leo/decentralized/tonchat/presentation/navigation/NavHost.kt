@@ -1,4 +1,4 @@
-package leo.decentralized.tonchat.navigation
+package leo.decentralized.tonchat.presentation.navigation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
@@ -54,7 +54,9 @@ fun NavHost(defaultScreen:String) {
 
         composable <Screen.ChatScreen>{
             val chatScreen = it.toRoute<Screen.ChatScreen>()
-            ChatScreen(navController = navHostController,address = chatScreen.address)
+            ChatScreen(navController = navHostController,
+                address = chatScreen.address,
+                contactPublicAddress = chatScreen.contactPublicAddress)
         }
 
 

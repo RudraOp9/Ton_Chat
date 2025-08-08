@@ -14,7 +14,9 @@ data class GetContactsResponse(
 
 @Serializable
 data class Contact(
-    @SerialName("contacts")
-    val contact: String
+    @SerialName("address")
+    val address: String,
+    @SerialName("public_Key")
+    val publicKey: String
 )
 

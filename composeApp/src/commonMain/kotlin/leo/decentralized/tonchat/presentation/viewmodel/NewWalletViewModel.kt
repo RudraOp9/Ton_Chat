@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import leo.decentralized.tonchat.data.repositories.security.SecureStorageRepository
 import leo.decentralized.tonchat.domain.usecase.TonWalletUseCase
 import leo.decentralized.tonchat.domain.usecase.UserUseCase
-import leo.decentralized.tonchat.navigation.Screens
+import leo.decentralized.tonchat.presentation.navigation.Screens
 
 @OptIn(ExperimentalStdlibApi::class)
 class NewWalletViewModel(
