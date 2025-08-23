@@ -1,6 +1,11 @@
 package leo.decentralized.tonchat.presentation.screens.home
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -33,6 +38,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
@@ -108,6 +114,12 @@ fun HomeScreen(navController: NavController,vm: HomeViewModel = koinViewModel())
                             LazyColumn(
                                 modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainerLow)
                             ) {
+                                if (vm.isContactsLoading.value) {
+                                    items(4) {
+                                        ChatItemShimmer()
+                                    }
+                                }
+
                                 items(vm.contacts.value) {
                                     ChatItem(
                                         it.address,
@@ -136,20 +148,20 @@ fun HomeScreen(navController: NavController,vm: HomeViewModel = koinViewModel())
             },
             horizontalPadding = 0.dp
         )
-    }
-    AnimatedVisibility(vm.newContactScreen.value){
-        NewContactSearchScreen({
-            vm.newContactScreen.value = false
-        },{
-            vm.searchAndAddNewContact(it)
-        })
+        AnimatedVisibility(vm.newContactScreen.value){
+            NewContactSearchScreen({
+                vm.newContactScreen.value = false
+            },{
+                vm.searchAndAddNewContact(it)
+            })
+        }
     }
 }
 
 @Composable
 fun ChatItem(
     address: String,
-    status: ChatStatus, // Consider using ChatStatus enum here
+    status: ChatStatus,
     unreadCount: Int,
     onClick: ()->Unit
 ) {
@@ -234,8 +246,83 @@ fun ChatItem(
     }
 }
 
+
+@Composable
+fun ChatItemShimmer() {
+    val width = with(LocalDensity.current) { LocalWindowInfo.current.containerSize.width.toDp() }
+    Column(
+        modifier = Modifier
+            .widthIn(max = if (width > 800.dp) 400.dp else Dp.Unspecified)
+            .fillMaxWidth()
+            .clickable(onClick = {})
+
+    ) {
+        Row(
+            modifier = Modifier .background(MaterialTheme.colorScheme.surface) .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.fillMaxWidth(1f)) {
+                Box{
+                    Text(
+                        text = "EQBg3rlccFWUaG1fHt_WLhFxsVvUn_136dIznbQfVm8k79dh",
+                        style = MaterialTheme.typography.titleMedium,
+                        overflow = TextOverflow.MiddleEllipsis,
+                           color = MaterialTheme.colorScheme.onBackground,
+                        maxLines = 1
+                    )
+                    Box(
+                        modifier = Modifier.matchParentSize().shimmerBackground()
+                    )
+                }
+                Spacer(Modifier.padding(top = 4.dp))
+                val annotedString = remember {
+                    AnnotatedString.Builder().apply {
+                        append("status : ")
+                        withStyle(style = SpanStyle(color = Color.Green.copy(alpha = 0.8f))) {
+                            this.append("Secure")
+                        }
+                    }.toAnnotatedString()
+                }
+                Box {
+                    Text(
+                        annotedString,
+                        style = MaterialTheme.typography.labelMedium,
+                        overflow = TextOverflow.MiddleEllipsis,
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
+                        maxLines = 1,
+                    )
+                    Box(
+                        modifier = Modifier.matchParentSize().shimmerBackground()
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.weight(1f).padding(start = 4.dp))
+        }
+        Spacer(modifier = Modifier.padding(top = 2.dp))
+    }
+}
+
 enum class ChatStatus {
     SECURE, UNSECURE, COMPROMISED, VULNERABLE, UNKNOWN
 }
 
+fun Modifier.shimmerBackground(shape: androidx.compose.ui.graphics.Shape = androidx.compose.foundation.shape.RoundedCornerShape(0.dp)): Modifier = composed {
+    val transition = rememberInfiniteTransition(label = "shimmerTransition")
+    val translateAnimation = transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1000f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1500), // Adjust duration as needed
+            repeatMode = RepeatMode.Restart
+        ), label = "shimmerTranslate"
+    )
+    background(
+        brush = androidx.compose.ui.graphics.Brush.linearGradient(
+            colors = listOf(MaterialTheme.colorScheme.surface, MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.colorScheme.surface),
+            start = androidx.compose.ui.geometry.Offset(translateAnimation.value - 500f, translateAnimation.value - 500f),
+            end = androidx.compose.ui.geometry.Offset(translateAnimation.value, translateAnimation.value)
+        ),
+        shape = shape
+    )
+}
 //todo checking the secure status of the user using password/pin : server sends an iv to user which will be encrypted using AES with the pin, and encrypted message will be sent to server, on each instance ( app open ) user has to encrypt the same iv using pass and send to server to allow sending the data present in cloud, in case of wrong three pin account will be marked unsecure.

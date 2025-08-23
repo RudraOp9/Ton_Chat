@@ -21,16 +21,19 @@ class HomeViewModel(
     var newContactScreen = mutableStateOf(false)
 
     val isLoadingText = mutableStateOf("")
-    val isLoading = mutableStateOf(true)
+    val isLoading = mutableStateOf(false)
+    val isContactsLoading = mutableStateOf(true)
     val snackBarText = mutableStateOf("")
     init {
         viewModelScope.launch(Dispatchers.IO){
             chatUseCase.getContacts().onSuccess {
                 println("Contacts: $it")
                 isLoading.value = false
+                isContactsLoading.value = false
                 contacts.value = it
             }.onFailure {
                 isLoading.value = false
+                isContactsLoading.value = false
                 snackBarText.value = it.message.toString()
             }
         }
@@ -45,22 +48,26 @@ class HomeViewModel(
     }
 
     fun searchAndAddNewContact(address:String){
+        isLoading.value = true
         viewModelScope.launch(Dispatchers.IO){
-            isLoading.value = true
             chatUseCase.newContact(address).onSuccess { it ->
                 if (it){
                     newContactScreen.value = false
+                    isContactsLoading.value = true
                     chatUseCase.getContacts().onSuccess {contact ->
                         contacts.value = contact
                         isLoading.value = false
+                        isContactsLoading.value = false
                     }.onFailure {
                         snackBarText.value = it.message.toString()
                         isLoading.value = false
+                        isContactsLoading.value = false
                     }
                 }
             }.onFailure {
                 snackBarText.value = it.message.toString()
                 isLoading.value = false
+                isContactsLoading.value = false
             }
         }
     }

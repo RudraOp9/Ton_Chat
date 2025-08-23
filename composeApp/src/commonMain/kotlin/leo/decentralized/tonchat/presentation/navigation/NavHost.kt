@@ -55,8 +55,8 @@ fun NavHost(defaultScreen:String) {
         composable <Screen.ChatScreen>{
             val chatScreen = it.toRoute<Screen.ChatScreen>()
             ChatScreen(navController = navHostController,
-                address = chatScreen.address,
-                contactPublicAddress = chatScreen.contactPublicAddress)
+                address = chatScreen.contactAddress,
+                contactPublicAddress = chatScreen.contactPublicKey)
         }
 
 

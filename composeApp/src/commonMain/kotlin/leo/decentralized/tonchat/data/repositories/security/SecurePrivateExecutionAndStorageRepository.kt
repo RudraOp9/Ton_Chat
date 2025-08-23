@@ -11,7 +11,7 @@ interface SecurePrivateExecutionAndStorageRepository {
     fun verifySignature(signature: ByteArray, message: String, publicKey: ByteArray,): Result<Boolean>
     @Deprecated("Can't save ed25519 in keystore")
     fun getPublicKey(): Result<ByteArray>
-    fun encryptMessage(message: String,contactPublicKey: ByteArray): Result<String>
-    fun decryptMessage(encryptedMessage: String,contactPublicKey: ByteArray): Result<String>
+    fun encryptMessage(message: String,contactAddress: String, contactPublicKey: String): Result<String>
+    fun decryptMessage(encryptedMessage: String,contactAddress: String, contactPublicKey: String): Result<String>
     fun generateSharedKey(contactPublicKey: ByteArray): Result<ByteArray>
 }

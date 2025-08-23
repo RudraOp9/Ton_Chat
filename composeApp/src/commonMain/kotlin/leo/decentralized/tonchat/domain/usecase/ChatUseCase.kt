@@ -1,7 +1,5 @@
 package leo.decentralized.tonchat.domain.usecase
 
-import io.ktor.util.hex
-import io.ktor.utils.io.core.toByteArray
 import leo.decentralized.tonchat.data.dataModels.Contact
 import leo.decentralized.tonchat.data.repositories.network.chatApi.ChatApiRepository
 import leo.decentralized.tonchat.data.repositories.security.SecurePrivateExecutionAndStorageRepository
@@ -31,10 +29,9 @@ class ChatUseCase(
         }
     }
 
-    suspend fun getChatFor(address: String,contactPublicAddress:String,onNewMessage: (Result<ChatMessage>) -> Unit): Result<Unit> {
-        println("contactPublicAddress : $contactPublicAddress")
+    suspend fun getChatFor(contactAddress: String, contactPublicKey:String, onNewMessage: (Result<ChatMessage>) -> Unit): Result<Unit> {
         try {
-            val result = chatApi.getChatFor(address)
+            val result = chatApi.getChatFor(contactAddress)
             val myAddress = secureStorage.getUserFriendlyAddress().getOrThrow()
             if (result.success) {
                 val listOfChats: MutableList<ChatMessage> = mutableListOf()
@@ -43,7 +40,8 @@ class ChatUseCase(
                         chats.forEach { mapEntry ->
                             securePrivateExecutionAndStorage.decryptMessage(
                                 mapEntry.message,
-                                hex(contactPublicAddress)
+                                contactAddress,
+                                contactPublicKey
                             ).onSuccess {
                                 onNewMessage(Result.success(ChatMessage(it,mapEntry.by == myAddress)))
                             }.onFailure {
@@ -61,10 +59,11 @@ class ChatUseCase(
         }
     }
 
-    suspend fun sendMessage(message:String, to:String, contactPublicAddress: String): Result<Long>{
+    suspend fun sendMessage(message:String, to:String, contactPublicKey: String): Result<Long>{
         val encryptedMessage = securePrivateExecutionAndStorage.encryptMessage(
             message = message,
-            contactPublicKey = hex(contactPublicAddress)
+            contactAddress = to,
+            contactPublicKey = contactPublicKey
         ).getOrElse {
             return Result.failure(it)
         }

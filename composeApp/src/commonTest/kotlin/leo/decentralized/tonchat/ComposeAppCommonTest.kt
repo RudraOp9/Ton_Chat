@@ -1,13 +1,16 @@
 package leo.decentralized.tonchat
 
 
+import io.github.andreypfau.kotlinx.crypto.sha2.sha256
 import io.ktor.util.hex
 import io.ktor.utils.io.core.String
 import io.ktor.utils.io.core.toByteArray
 import kotlinx.io.bytestring.toHexString
 import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.api.pub.PublicKeyEd25519
+import org.ton.crypto.DecryptorAes
 import org.ton.crypto.Ed25519
+import org.ton.crypto.EncryptorAes
 import org.ton.crypto.EncryptorEd25519
 import org.ton.mnemonic.Mnemonic
 import kotlin.collections.toByteArray
@@ -102,6 +105,12 @@ class ComposeAppCommonTest {
         val encryptedMsg = hex(sharedPrivateKey.publicKey().encrypt("test".toByteArray()))
         val decryptedMsg = sharedPrivateKey2.decrypt(hex(encryptedMsg))
 
+        val shaKey = sha256(sharedKey)
+        val enc = EncryptorAes(shaKey).encrypt("test".toByteArray()).toHexString()
+        val dec = DecryptorAes(shaKey).decrypt(enc.hexToByteArray()).decodeToString()
+        
+
+
         println("""
             privateKey = ${hex(privateKey)}
             publicKey = ${hex(publicKey)}
@@ -111,6 +120,9 @@ class ComposeAppCommonTest {
             shareKey2 = ${hex(shareKey2)}
             encryptedMsg = $encryptedMsg
             decryptedMsg = ${decryptedMsg.decodeToString()}
+            shaKey = ${hex(shaKey)}
+            enc = $enc
+            dec = $dec
         """.trimIndent())
 
         assertEquals(hex(sharedKey),hex(shareKey2))

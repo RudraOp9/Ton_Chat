@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.automirrored.sharp.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
@@ -55,7 +58,7 @@ fun ChatScreen(
     vm: ChatViewModel = koinViewModel()
 ){
     LaunchedEffect(Unit){
-        vm.getChats(address = address,contactPublicAddress = contactPublicAddress)
+        vm.getChats(contactAddress = address,contactPublicKey = contactPublicAddress)
     }
 
     val snackBarHost = SnackbarHostState()
@@ -135,7 +138,7 @@ fun ChatScreen(
                                 .padding(start = 4.dp)
                                 .clickable {
                                     if (someText.value.isNotBlank()) {
-                                        vm.sendMessage(someText.value, contactPublicAddress)
+                                        vm.sendMessage(someText.value, address, contactPublicAddress)
                                         someText.value = ""
                                     }
                                 })
@@ -157,7 +160,7 @@ fun ChatScreen(
     }
 }
 
-data class ChatMessage(val message: String, val isMine: Boolean)
+data class ChatMessage(val message: String, val isMine: Boolean, var isSending: Boolean? = false)
 
 @Composable
 fun ChatBubble(chatMessage: ChatMessage, totalWidth: Int, hasChatAbove: Boolean, hasChatBelow: Boolean){
@@ -183,34 +186,53 @@ fun ChatBubble(chatMessage: ChatMessage, totalWidth: Int, hasChatAbove: Boolean,
     val otherMsgColor = MaterialTheme.colorScheme.surfaceContainer
     val myMsgColor = MaterialTheme.colorScheme.primaryContainer
 
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .wrapContentWidth(
-        if (singleSide || !isMyMsg) {
-            Alignment.Start
-        }else{
-            Alignment.End
-        }
-    ).widthIn(max = with(LocalDensity.current){(totalWidth*0.84f).toDp()})
-        .background(
-        if (isMyMsg) {
-            myMsgColor
-        } else {
-            otherMsgColor
-        },
-        if (isMyMsg){
-            myMsgShape
-        }else{
-            otherMsgShape
-        }
-    )) {
-        SelectionContainer {
-            Text(
-                text = chatMessage.message,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.W400
-            )
+    Row(
+        modifier = Modifier
+    ){
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentWidth(
+                    if (singleSide || !isMyMsg) {
+                        Alignment.Start
+                    } else {
+                        Alignment.End
+                    }
+                ).widthIn(max = with(LocalDensity.current) { (totalWidth * 0.84f).toDp() })
+                .background(
+                    if (isMyMsg) {
+                        myMsgColor
+                    } else {
+                        otherMsgColor
+                    },
+                    if (isMyMsg) {
+                        myMsgShape
+                    } else {
+                        otherMsgShape
+                    }
+                )
+        ) {
+            Row(
+                verticalAlignment = Alignment.Bottom
+            ) {
+                SelectionContainer(
+                    modifier = Modifier.weight(1f, fill = false)
+                ) {
+                    Text(
+                        text = chatMessage.message,
+                        modifier = Modifier.padding(start = 16.dp, top = 6.dp, bottom = 6.dp,end = 8.dp),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.W400
+                    )
+                }
+                if (chatMessage.isSending == true) {
+                    Icon(
+                            imageVector = Icons.Outlined.AccessTime,
+                            contentDescription = "sending",
+                            modifier = Modifier.size(20.dp).padding(end = 8.dp)
+                    )
+                }
+            }
         }
     }
 

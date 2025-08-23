@@ -15,12 +15,10 @@ class ChatViewModel(
     var shimmer = mutableStateOf(true)
     var chatList = mutableStateOf(listOf<ChatMessage>())
     var snackBarText = mutableStateOf("")
-    var chatAddress = ""
 
-    fun getChats(address: String, contactPublicAddress: String) {
-        chatAddress = address
+    fun getChats(contactAddress: String, contactPublicKey: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            chatUseCase.getChatFor(address = address, contactPublicAddress = contactPublicAddress, {
+            chatUseCase.getChatFor(contactAddress = contactAddress, contactPublicKey = contactPublicKey,{
                 it.onSuccess {chat ->
                     chatList.value = chatList.value.toMutableList().apply {
                         add(0,chat)
@@ -38,15 +36,20 @@ class ChatViewModel(
         }
     }
 
-    fun sendMessage(message: String,contactPublicAddress:String) {
+    fun sendMessage(message: String, contactAddress:String, contactPublicKey:String) {
         viewModelScope.launch(Dispatchers.IO) {
+            val chatMsg = ChatMessage(message, isMine = true, isSending = true)
             chatList.value = chatList.value.toMutableList().apply {
-                add(0, ChatMessage(message, true))
+                add(0,chatMsg)
             }
-            chatUseCase.sendMessage(message = message, to = chatAddress, contactPublicAddress ).onSuccess {
-                //todo handle remove sending icon
+            chatUseCase.sendMessage(message = message, to = contactAddress, contactPublicKey ).onSuccess {
+                chatList.value = chatList.value.toMutableList().apply {
+                    val index = indexOf(chatMsg)
+                    set(index,chatList.value[index].copy(isSending = false))
+                }
             }.onFailure {
                 //todo handle add failure icon
+                it.printStackTrace()
             }
         }
     }
