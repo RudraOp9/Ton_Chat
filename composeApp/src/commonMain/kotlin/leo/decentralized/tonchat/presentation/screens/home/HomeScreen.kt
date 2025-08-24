@@ -54,6 +54,7 @@ import androidx.navigation.NavController
 import leo.decentralized.tonchat.presentation.navigation.Screen
 import leo.decentralized.tonchat.presentation.screens.DefaultScreen
 import leo.decentralized.tonchat.presentation.screens.LoadingScreen
+import leo.decentralized.tonchat.presentation.uiComponents.shimmerBackground
 import leo.decentralized.tonchat.presentation.viewmodel.HomeViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -306,23 +307,5 @@ enum class ChatStatus {
     SECURE, UNSECURE, COMPROMISED, VULNERABLE, UNKNOWN
 }
 
-fun Modifier.shimmerBackground(shape: androidx.compose.ui.graphics.Shape = androidx.compose.foundation.shape.RoundedCornerShape(0.dp)): Modifier = composed {
-    val transition = rememberInfiniteTransition(label = "shimmerTransition")
-    val translateAnimation = transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1000f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1500), // Adjust duration as needed
-            repeatMode = RepeatMode.Restart
-        ), label = "shimmerTranslate"
-    )
-    background(
-        brush = androidx.compose.ui.graphics.Brush.linearGradient(
-            colors = listOf(MaterialTheme.colorScheme.surface, MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.colorScheme.surface),
-            start = androidx.compose.ui.geometry.Offset(translateAnimation.value - 500f, translateAnimation.value - 500f),
-            end = androidx.compose.ui.geometry.Offset(translateAnimation.value, translateAnimation.value)
-        ),
-        shape = shape
-    )
-}
+
 //todo checking the secure status of the user using password/pin : server sends an iv to user which will be encrypted using AES with the pin, and encrypted message will be sent to server, on each instance ( app open ) user has to encrypt the same iv using pass and send to server to allow sending the data present in cloud, in case of wrong three pin account will be marked unsecure.

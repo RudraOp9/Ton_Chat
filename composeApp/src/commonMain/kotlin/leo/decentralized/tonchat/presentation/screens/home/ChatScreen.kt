@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import leo.decentralized.tonchat.presentation.screens.DefaultScreen
 import leo.decentralized.tonchat.presentation.screens.LoadingScreen
+import leo.decentralized.tonchat.presentation.uiComponents.shimmerBackground
 import leo.decentralized.tonchat.presentation.viewmodel.ChatViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -101,6 +102,32 @@ fun ChatScreen(
                 }
 
                 LazyColumn(modifier = Modifier.fillMaxSize().padding(bottom = with(LocalDensity.current){messageTextFieldHeight.value.toDp()}).padding(horizontal = 8.dp), reverseLayout = true){
+                    if (vm.shimmer.value){
+                        item {
+                            ChatBubbleShimmer(
+                                ChatMessage(
+                                    message = "This is placeholder",
+                                    isMine = true,
+                                    isSending = false
+                                ),
+                                totalWidth = availableWidth.value,
+                                hasChatAbove = false,
+                                hasChatBelow = false
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            ChatBubbleShimmer(
+                                ChatMessage(
+                                    message = "Message",
+                                    isMine = false,
+                                    isSending = false
+                                ),
+                                totalWidth =  availableWidth.value,
+                                hasChatAbove = false,
+                                hasChatBelow = false
+                            )
+                        }
+
+                    }
                     items(vm.chatList.value.size) { index ->
                         ChatBubble(
                             vm.chatList.value[index],
@@ -235,6 +262,94 @@ fun ChatBubble(chatMessage: ChatMessage, totalWidth: Int, hasChatAbove: Boolean,
                 }
             }
         }
+    }
+
+}
+
+
+
+@Composable
+fun ChatBubbleShimmer(chatMessage: ChatMessage, totalWidth: Int, hasChatAbove: Boolean, hasChatBelow: Boolean){
+    val singleSide = totalWidth > with(LocalDensity.current){600.dp.toPx()}
+    val isMyMsg = chatMessage.isMine
+    val otherMsgShape = RoundedCornerShape(
+        topEnd = 16.dp,
+        bottomEnd = 16.dp,
+        topStart = if (hasChatAbove) {8.dp} else {16.dp},
+        bottomStart = if (hasChatBelow) {8.dp} else {0.dp}
+    )
+    val myMsgShape =
+        if (singleSide)
+        {otherMsgShape
+        }else {
+        RoundedCornerShape(
+            topEnd = if (hasChatAbove) {8.dp} else {16.dp} ,
+            bottomEnd = if (hasChatBelow) {4.dp} else {0.dp},
+            topStart = 16.dp,
+            bottomStart = 16.dp)
+        }
+
+    val otherMsgColor = MaterialTheme.colorScheme.surfaceContainer
+    val myMsgColor = MaterialTheme.colorScheme.primaryContainer
+
+    Box {
+        Row(
+            modifier = Modifier
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentWidth(
+                        if (singleSide || !isMyMsg) {
+                            Alignment.Start
+                        } else {
+                            Alignment.End
+                        }
+                    ).widthIn(max = with(LocalDensity.current) { (totalWidth * 0.84f).toDp() })
+                    .background(
+                        if (isMyMsg) {
+                            myMsgColor
+                        } else {
+                            otherMsgColor
+                        },
+                        if (isMyMsg) {
+                            myMsgShape
+                        } else {
+                            otherMsgShape
+                        }
+                    )
+            ) {
+                Row(
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    SelectionContainer(
+                        modifier = Modifier.weight(1f, fill = false)
+                    ) {
+                        Text(
+                            text = chatMessage.message,
+                            modifier = Modifier.padding(
+                                start = 16.dp,
+                                top = 6.dp,
+                                bottom = 6.dp,
+                                end = 8.dp
+                            ),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.W400
+                        )
+                    }
+                    if (chatMessage.isSending == true) {
+                        Icon(
+                            imageVector = Icons.Outlined.AccessTime,
+                            contentDescription = "sending",
+                            modifier = Modifier.size(20.dp).padding(end = 8.dp)
+                        )
+                    }
+                }
+            }
+        }
+        Box(
+            modifier = Modifier.matchParentSize().shimmerBackground()
+        )
     }
 
 }
