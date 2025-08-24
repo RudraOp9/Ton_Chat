@@ -131,12 +131,12 @@ fun ImportWalletScreen(
                             ),
                             colors = ButtonDefaults.outlinedButtonColors(
                                 containerColor = animateColorAsState(
-                                    targetValue = if (vm.isSecretKeys24.value) MaterialTheme.colorScheme.surfaceContainerHighest else MaterialTheme.colorScheme.surfaceContainerLow,
+                                    targetValue = if (vm.isSecretKeys24.value) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainer,
                                     animationSpec = tween(),
                                     label = "24WordsContainerColor"
                                 ).value,
                                 contentColor = animateColorAsState(
-                                    targetValue = if (vm.isSecretKeys24.value) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.surfaceContainerHighest,
+                                    targetValue = if (vm.isSecretKeys24.value) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
                                     animationSpec = tween(),
                                     label = "24WordsContentColor"
                                 ).value
@@ -159,11 +159,11 @@ fun ImportWalletScreen(
                             ),
                             colors = ButtonDefaults.outlinedButtonColors(
                                 containerColor = animateColorAsState(
-                                    targetValue = if (!vm.isSecretKeys24.value) MaterialTheme.colorScheme.surfaceContainerHighest else MaterialTheme.colorScheme.surfaceContainerLow,
+                                    targetValue = if (!vm.isSecretKeys24.value) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainer,
                                     label = "12WordsContainerColor"
                                 ).value,
                                 contentColor = animateColorAsState(
-                                    targetValue = if (!vm.isSecretKeys24.value) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.surfaceContainerHighest,
+                                    targetValue = if (!vm.isSecretKeys24.value) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
                                     animationSpec = tween(),
                                     label = "24WordsContentColor"
                                 ).value

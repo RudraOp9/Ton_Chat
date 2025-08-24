@@ -25,7 +25,7 @@ class ImportWalletViewModel(
     private val password: Password
 ) : ViewModel() {
     val secretKeys = mutableStateOf(List(24) { "" })
-    val isSecretKeys24 = mutableStateOf(false)
+    val isSecretKeys24 = mutableStateOf(true)
     val isSecretKeysValid = derivedStateOf {
         if (isSecretKeys24.value) {
             (!secretKeys.value.contains(""))
@@ -44,7 +44,7 @@ class ImportWalletViewModel(
     @OptIn(ExperimentalStdlibApi::class)
     fun importWallet(navController: NavController) {
         isLoading.value = true
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default){
             val wallet = tonWalletUseCase.generateWallet(
                 secretKeys = if (isSecretKeys24.value) secretKeys.value else secretKeys.value.slice(
                     0..11
@@ -132,7 +132,7 @@ class ImportWalletViewModel(
                                     isLoadingText.value = "Account exists. Logging in..."
                                     launch(Dispatchers.Main){
                                         navController.navigate(Screens.HomeScreen.screen){
-                                            popUpTo(Screens.ImportWallet.screen){inclusive = true}
+                                            popUpTo(Screens.Welcome.screen){inclusive = true}
                                         }
                                     }
                                 } else {
@@ -141,7 +141,7 @@ class ImportWalletViewModel(
                                     if (newUserStatus.success) {
                                         launch(Dispatchers.Main){
                                             navController.navigate(Screens.HomeScreen.screen){
-                                                popUpTo(Screens.ImportWallet.screen){inclusive = true}
+                                                popUpTo(Screens.Welcome.screen){inclusive = true}
                                             }
                                         }
                                     } else {

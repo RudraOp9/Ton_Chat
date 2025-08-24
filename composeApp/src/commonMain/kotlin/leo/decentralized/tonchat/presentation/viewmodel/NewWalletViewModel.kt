@@ -103,7 +103,7 @@ class NewWalletViewModel(
         if(result.success){
             viewModelScope.launch(Dispatchers.Main){
                 navController.navigate(Screens.HomeScreen.screen){
-                    popUpTo(Screens.ImportWallet.screen){inclusive = true}
+                    popUpTo(Screens.Welcome.screen){inclusive = true}
                 }
             }
             snackBarText.value = "Account created successfully"

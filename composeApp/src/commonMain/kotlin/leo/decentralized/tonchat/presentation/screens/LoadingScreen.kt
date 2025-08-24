@@ -4,8 +4,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -19,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun LoadingScreen(
     isLoading: Boolean,
@@ -26,14 +32,13 @@ fun LoadingScreen(
     snackbarHostState: SnackbarHostState,
     content: @Composable () -> Unit
 ) {
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) }
-    ) { paddingValues ->
+    SnackbarHost(snackbarHostState, modifier = Modifier.imePadding())
+
         Box(modifier = Modifier.fillMaxSize()) {
             content()
             if (isLoading) {
                 Box(
-                    modifier = Modifier.fillMaxSize().padding(paddingValues)
+                    modifier = Modifier.fillMaxSize()
                         .clickable(null, null, enabled = false) {}
                         .background(MaterialTheme.colorScheme.background.copy(alpha = 0.5f))
                 ) {
@@ -59,5 +64,5 @@ fun LoadingScreen(
             }
 
         }
-    }
+
 }

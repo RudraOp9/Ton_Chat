@@ -39,7 +39,7 @@ fun App(koinAppDeclaration: KoinAppDeclaration? = null, discardSplashScreen: () 
         }
         if (!vm.isLoading.value) {
             TonDecentralizedChatTheme {
-                Column(
+                Box(
                     modifier = Modifier
                         .fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
