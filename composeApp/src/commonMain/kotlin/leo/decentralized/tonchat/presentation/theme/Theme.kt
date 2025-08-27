@@ -1,6 +1,7 @@
 package leo.decentralized.tonchat.presentation.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
@@ -44,9 +45,12 @@ fun TonDecentralizedChatTheme(
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
-        darkTheme -> DarkColorScheme
+        darkTheme -> {
+            DarkColorScheme
+        }
         else -> LightColorScheme
     }
+    //todo handle status bar text color and other also, maybe needed an expect/actual
 /*    val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
@@ -61,4 +65,9 @@ fun TonDecentralizedChatTheme(
         colorScheme = colorScheme,
         content = content
     )
+}
+
+
+enum class Theme {
+    Dark,System,Light
 }

@@ -42,7 +42,9 @@ import androidx.navigation.compose.rememberNavController
 import leo.decentralized.tonchat.presentation.navigation.Screens
 import leo.decentralized.tonchat.presentation.screens.DefaultScreen
 import leo.decentralized.tonchat.presentation.theme.TonDecentralizedChatTheme
+import leo.decentralized.tonchat.presentation.viewmodel.SettingsViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.compose.viewmodel.koinViewModel
 
 
 enum class ThemeOption {
@@ -60,7 +62,7 @@ private enum class ActiveSettingsScreen {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(navController: NavHostController) {
+fun SettingsScreen(navController: NavHostController, vm : SettingsViewModel = koinViewModel()) {
     DefaultScreen(
         screenName = "Settings",
         primaryButtonIcon = Icons.AutoMirrored.Default.ArrowBack,
@@ -120,6 +122,7 @@ fun SettingsScreen(navController: NavHostController) {
                                 text = "System default",
                                 isSelected = currentTheme == ThemeOption.SYSTEM,
                                 onClick = {
+                                    vm.changeTheme(1)
                                     currentTheme = ThemeOption.SYSTEM
                                     showThemeInfo = false
                                 }
@@ -129,6 +132,7 @@ fun SettingsScreen(navController: NavHostController) {
                                 text = "Light",
                                 isSelected = currentTheme == ThemeOption.LIGHT,
                                 onClick = {
+                                    vm.changeTheme(2)
                                     currentTheme = ThemeOption.LIGHT
                                     showThemeInfo = false
                                 }
@@ -138,6 +142,7 @@ fun SettingsScreen(navController: NavHostController) {
                                 text = "Dark",
                                 isSelected = currentTheme == ThemeOption.DARK,
                                 onClick = {
+                                    vm.changeTheme(0)
                                     currentTheme = ThemeOption.DARK
                                     showThemeInfo = false
                                 }

@@ -1,12 +1,15 @@
 package leo.decentralized.tonchat.data.repositories.security
 
 import com.russhwolf.settings.Settings
+import com.russhwolf.settings.get
 import io.ktor.util.hex
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class SecureStorageRepositoryImpl(
     private val settings: Settings,
-    private val passwordEncryptionRepository: PasswordEncryptionRepository
+    private val passwordEncryptionRepository: PasswordEncryptionRepository,
 ):SecureStorageRepository  {
+    override var currentTheme: MutableStateFlow<Int> = MutableStateFlow(1)
 
     override fun storeToken(token: String): Result<Boolean> {
         try {
@@ -167,7 +170,14 @@ class SecureStorageRepositoryImpl(
         }catch (e: Exception){
             return Result.failure(e)
         }
+    }
 
+    override fun refreshTheme() {
+        currentTheme.value = settings.getInt("Theme",1)
+    }
+
+    override fun setTheme(theme: Int): Result<Unit> {
+        return Result.success(settings.putInt("Theme",theme))
     }
 
 }

@@ -19,6 +19,7 @@ import leo.decentralized.tonchat.presentation.viewmodel.HomeViewModel
 import leo.decentralized.tonchat.presentation.viewmodel.ImportWalletViewModel
 import leo.decentralized.tonchat.presentation.viewmodel.InputPasswordViewModel
 import leo.decentralized.tonchat.presentation.viewmodel.NewWalletViewModel
+import leo.decentralized.tonchat.presentation.viewmodel.SettingsViewModel
 import leo.decentralized.tonchat.presentation.viewmodel.SplashScreenViewModel
 import leo.decentralized.tonchat.utils.networking.createHttpClient
 import leo.decentralized.tonchat.utils.networking.httpClientEngine
@@ -34,6 +35,7 @@ val commonModule = module {
     viewModel { HomeViewModel(get(),get()) }
     viewModel { SplashScreenViewModel(get()) }
     viewModel { ChatViewModel(get()) }
+    viewModel { SettingsViewModel(get()) }
 
     //use cases
     factory { TonWalletUseCase(get(),get()) }

@@ -1,5 +1,7 @@
 package leo.decentralized.tonchat
 
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
@@ -17,6 +19,7 @@ import leo.decentralized.tonchat.presentation.viewmodel.SplashScreenViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinApplication
 import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.module.Module
 import org.koin.dsl.KoinAppDeclaration
 import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.api.pub.PublicKeyEd25519
@@ -24,11 +27,12 @@ import org.ton.crypto.Ed25519
 import org.ton.mnemonic.Mnemonic
 
 @Composable
-fun App(koinAppDeclaration: KoinAppDeclaration? = null, discardSplashScreen: () -> Unit) {
+fun App(koinAppDeclaration: KoinAppDeclaration? = null, module: Module? = null, discardSplashScreen: () -> Unit) {
     KoinApplication(
         application = remember {{
             koinAppDeclaration?.invoke(this)
             modules(appModule)
+            module?.let { modules(it) }
         }}
     ) {
         val vm : SplashScreenViewModel = koinViewModel()
@@ -38,11 +42,16 @@ fun App(koinAppDeclaration: KoinAppDeclaration? = null, discardSplashScreen: () 
             }
         }
         if (!vm.isLoading.value) {
-            TonDecentralizedChatTheme {
+            TonDecentralizedChatTheme(
+                darkTheme = when(vm.theme.collectAsState().value){
+                    0 -> true
+                    2 -> false
+                    else -> isSystemInDarkTheme()
+                }
+            ){
                 Box(
                     modifier = Modifier
                         .fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     NavHost(vm.screen.value)
                 }
