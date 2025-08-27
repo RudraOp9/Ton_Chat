@@ -52,6 +52,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import leo.decentralized.tonchat.presentation.navigation.Screen
+import leo.decentralized.tonchat.presentation.navigation.Screens
 import leo.decentralized.tonchat.presentation.screens.DefaultScreen
 import leo.decentralized.tonchat.presentation.screens.LoadingScreen
 import leo.decentralized.tonchat.presentation.uiComponents.shimmerBackground
@@ -98,7 +99,7 @@ fun HomeScreen(navController: NavController,vm: HomeViewModel = koinViewModel())
                             indication = ripple(color = MaterialTheme.colorScheme.primary),
                             role = Role.Button
                         ) {
-
+                            navController.navigate(Screens.Settings.screen)
                         }
                         .padding(vertical = 2.dp, horizontal = 8.dp)
                 )

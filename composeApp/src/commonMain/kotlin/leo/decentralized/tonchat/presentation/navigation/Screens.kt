@@ -8,7 +8,12 @@ enum class Screens(val screen: String) {
     Welcome(screen = Res.string.welcome.key),
     ImportWallet(screen = Res.string.import_wallet.key),
     NewWallet(screen = Res.string.create_new_wallet.key),
-    HomeScreen(screen = Res.string.home_screen.key)
+    HomeScreen(screen = Res.string.home_screen.key),
+    Settings(screen = Res.string.settings.key),
+    Account(screen = Res.string.account.key),
+    PrivacyNSecurity(screen = Res.string.privacy_security.key),
+    Information(screen = Res.string.information.key),
+    About(screen = Res.string.about.key)
 }
 
 //interface Screen
@@ -18,3 +23,4 @@ sealed class Screen{
     @Serializable
     data class PassCode(val isNew: Boolean, val goTo: String):Screen()
 }
+

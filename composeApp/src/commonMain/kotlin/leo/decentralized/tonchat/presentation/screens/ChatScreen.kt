@@ -1,4 +1,4 @@
-package leo.decentralized.tonchat.presentation.screens.home
+package leo.decentralized.tonchat.presentation.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -45,8 +45,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import leo.decentralized.tonchat.presentation.screens.DefaultScreen
-import leo.decentralized.tonchat.presentation.screens.LoadingScreen
 import leo.decentralized.tonchat.presentation.uiComponents.shimmerBackground
 import leo.decentralized.tonchat.presentation.viewmodel.ChatViewModel
 import org.koin.compose.viewmodel.koinViewModel

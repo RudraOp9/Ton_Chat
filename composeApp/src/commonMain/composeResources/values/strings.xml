@@ -6,4 +6,9 @@
     <string name="home_screen">home_screen</string>
     <string name="chat_screen">chat_screen</string>
     <string name="pass_code">pass_code</string>
+    <string name="settings">settings</string>
+    <string name="account">account</string>
+    <string name="privacy_security">privacy_security</string>
+    <string name="information">information</string>
+    <string name="about">about</string>
 </resources>

@@ -4,7 +4,7 @@ import leo.decentralized.tonchat.data.dataModels.Contact
 import leo.decentralized.tonchat.data.repositories.network.chatApi.ChatApiRepository
 import leo.decentralized.tonchat.data.repositories.security.SecurePrivateExecutionAndStorageRepository
 import leo.decentralized.tonchat.data.repositories.security.SecureStorageRepository
-import leo.decentralized.tonchat.presentation.screens.home.ChatMessage
+import leo.decentralized.tonchat.presentation.screens.ChatMessage
 
 class ChatUseCase(
     private val chatApi: ChatApiRepository,

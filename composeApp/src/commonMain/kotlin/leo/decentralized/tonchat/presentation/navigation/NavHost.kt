@@ -13,8 +13,13 @@ import leo.decentralized.tonchat.presentation.screens.ImportWalletScreen
 import leo.decentralized.tonchat.presentation.screens.InputPasswordScreen
 import leo.decentralized.tonchat.presentation.screens.NewWalletScreen
 import leo.decentralized.tonchat.presentation.screens.WelcomeScreen
-import leo.decentralized.tonchat.presentation.screens.home.ChatScreen
+import leo.decentralized.tonchat.presentation.screens.ChatScreen
 import leo.decentralized.tonchat.presentation.screens.home.HomeScreen
+import leo.decentralized.tonchat.presentation.screens.settings.AboutSettingsScreen
+import leo.decentralized.tonchat.presentation.screens.settings.AccountManageSettingsScreen
+import leo.decentralized.tonchat.presentation.screens.settings.InformationSettingsScreen
+import leo.decentralized.tonchat.presentation.screens.settings.PrivacyAndSecuritySettingsScreen
+import leo.decentralized.tonchat.presentation.screens.settings.SettingsScreen
 
 @Composable
 fun NavHost(defaultScreen:String) {
@@ -57,6 +62,34 @@ fun NavHost(defaultScreen:String) {
             ChatScreen(navController = navHostController,
                 address = chatScreen.contactAddress,
                 contactPublicAddress = chatScreen.contactPublicKey)
+        }
+
+        composable(Screens.Settings.screen) {
+            SettingsScreen(navHostController)
+        }
+
+        composable(Screens.Account.screen) {
+            AccountManageSettingsScreen {
+                navHostController.popBackStack()
+            }
+        }
+
+        composable(Screens.PrivacyNSecurity.screen) {
+            PrivacyAndSecuritySettingsScreen {
+                navHostController.popBackStack()
+            }
+        }
+
+        composable(Screens.Information.screen) {
+            InformationSettingsScreen {
+                navHostController.popBackStack()
+            }
+        }
+
+        composable(Screens.About.screen){
+            AboutSettingsScreen {
+                navHostController.popBackStack()
+            }
         }
 
 

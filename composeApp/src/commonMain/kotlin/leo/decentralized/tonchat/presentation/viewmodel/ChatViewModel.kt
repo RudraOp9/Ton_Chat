@@ -7,7 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import leo.decentralized.tonchat.domain.usecase.ChatUseCase
-import leo.decentralized.tonchat.presentation.screens.home.ChatMessage
+import leo.decentralized.tonchat.presentation.screens.ChatMessage
 
 class ChatViewModel(
     private val chatUseCase: ChatUseCase
