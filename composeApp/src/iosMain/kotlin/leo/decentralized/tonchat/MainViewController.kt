@@ -1,7 +1,14 @@
 package leo.decentralized.tonchat
 
 import androidx.compose.ui.window.ComposeUIViewController
+import leo.decentralized.tonchat.data.repositories.security.PasswordEncryptionRepository
 
-fun MainViewController() = ComposeUIViewController(configure = {
+import org.koin.dsl.module
 
-}) { App() }
+fun MainViewController(getPasswordEncryptionRepositoryImpl: () -> PasswordEncryptionRepository) = ComposeUIViewController(
+    configure = {
+    }) {
+    App(discardSplashScreen = {}, module = module {
+        single<PasswordEncryptionRepository> { getPasswordEncryptionRepositoryImpl() }
+    })
+}
