@@ -247,7 +247,8 @@ fun ChatBubble(chatMessage: ChatMessage, totalWidth: Int, hasChatAbove: Boolean,
                     Text(
                         text = chatMessage.message,
                         modifier = Modifier.padding(start = 16.dp, top = 6.dp, bottom = 6.dp,end = 8.dp),
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.W400
                     )
                 }

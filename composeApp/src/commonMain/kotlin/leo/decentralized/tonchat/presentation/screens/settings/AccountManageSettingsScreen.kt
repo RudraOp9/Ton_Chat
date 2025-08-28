@@ -5,6 +5,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -12,14 +13,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
 import leo.decentralized.tonchat.presentation.screens.DefaultScreen
+import leo.decentralized.tonchat.presentation.viewmodel.settings.AccountManageSettingsViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun AccountManageSettingsScreen(onBackClick: () -> Unit) {
+fun AccountManageSettingsScreen(onBackClick: (loggedOut: Boolean) -> Unit, vm : AccountManageSettingsViewModel = koinViewModel()) {
     DefaultScreen(
         screenName = "Account",
         primaryButtonIcon = Icons.AutoMirrored.Default.ArrowBack,
         onPrimaryClick = {
-            onBackClick()
+            onBackClick(false)
         }) {
         item {
             ListItem(
@@ -40,7 +43,7 @@ fun AccountManageSettingsScreen(onBackClick: () -> Unit) {
                     indication = null,
                     role = Role.Button
                 ) {
-                    //todo
+                    vm.wipeChatsFromServer()
                 }.clip(RoundedCornerShape(12))
             )
 
@@ -56,13 +59,13 @@ fun AccountManageSettingsScreen(onBackClick: () -> Unit) {
                     )
                 },
                 trailingContent = {},
-                //  colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+                colors = ListItemDefaults.colors(headlineColor = MaterialTheme.colorScheme.surfaceContainerLow, supportingColor = MaterialTheme.colorScheme.surfaceContainerLow),
                 modifier = Modifier.clickable(
                     interactionSource = null,
                     indication = null,
                     role = Role.Button
                 ) {
-                    //todo
+
                 }.clip(RoundedCornerShape(12))
             )
 
@@ -84,7 +87,9 @@ fun AccountManageSettingsScreen(onBackClick: () -> Unit) {
                     indication = null,
                     role = Role.Button
                 ) {
-                    //todo
+                    vm.logout {
+                        onBackClick(true)
+                    }
                 }.clip(RoundedCornerShape(12))
             )
 

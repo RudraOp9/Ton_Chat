@@ -12,9 +12,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
 import leo.decentralized.tonchat.presentation.screens.DefaultScreen
+import leo.decentralized.tonchat.presentation.viewmodel.settings.AboutSettingsViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun AboutSettingsScreen(onBackClick: () -> Unit) {
+fun AboutSettingsScreen(onBackClick: () -> Unit,vm : AboutSettingsViewModel = koinViewModel()) {
     DefaultScreen(
         screenName = "About",
         primaryButtonIcon = Icons.AutoMirrored.Default.ArrowBack,
@@ -40,7 +42,7 @@ fun AboutSettingsScreen(onBackClick: () -> Unit) {
                     indication = null,
                     role = Role.Button
                 ) {
-                    //todo
+                    vm.getHelpFromEmail()
                 }.clip(RoundedCornerShape(12))
             )
 
@@ -62,7 +64,7 @@ fun AboutSettingsScreen(onBackClick: () -> Unit) {
                     indication = null,
                     role = Role.Button
                 ) {
-                    //todo
+                    vm.openFAQUrl()
                 }.clip(RoundedCornerShape(12))
             )
 
@@ -84,7 +86,7 @@ fun AboutSettingsScreen(onBackClick: () -> Unit) {
                     indication = null,
                     role = Role.Button
                 ) {
-                    //todo
+                    vm.openGithubUrl()
                 }.clip(RoundedCornerShape(12))
             )
 
@@ -106,7 +108,7 @@ fun AboutSettingsScreen(onBackClick: () -> Unit) {
                     indication = null,
                     role = Role.Button
                 ) {
-                    //todo
+                    vm.openSupportUsUrl()
                 }.clip(RoundedCornerShape(12))
             )
         }

@@ -1,4 +1,4 @@
-package leo.decentralized.tonchat.presentation.viewmodel
+package leo.decentralized.tonchat.presentation.viewmodel.settings
 
 import androidx.lifecycle.ViewModel
 import leo.decentralized.tonchat.data.repositories.security.SecureStorageRepository

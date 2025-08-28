@@ -69,9 +69,17 @@ fun NavHost(defaultScreen:String) {
         }
 
         composable(Screens.Account.screen) {
-            AccountManageSettingsScreen {
-                navHostController.popBackStack()
-            }
+            AccountManageSettingsScreen( { loggedOut ->
+                if (loggedOut){
+                    navHostController.navigate(Screens.Welcome.screen) {
+                        popUpTo(navHostController.graph.id) {
+                            inclusive = true
+                        }
+                    }
+                }else {
+                    navHostController.popBackStack()
+                }
+            })
         }
 
         composable(Screens.PrivacyNSecurity.screen) {
@@ -87,9 +95,9 @@ fun NavHost(defaultScreen:String) {
         }
 
         composable(Screens.About.screen){
-            AboutSettingsScreen {
+            AboutSettingsScreen ({
                 navHostController.popBackStack()
-            }
+            })
         }
 
 

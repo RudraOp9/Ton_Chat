@@ -32,6 +32,11 @@ class ChatApiRepositoryImpl(
                     }
                 }
             val response = request.body<GetContactsResponse>()
+
+            response.contacts?.forEach {
+                println(it.address)
+            }
+
             return if (request.status.value in 200..299) {
                 Effect(true, response)
             } else {
@@ -61,7 +66,7 @@ class ChatApiRepositoryImpl(
             val response = request.body<GenericMessageResponse>()
             return if (request.status.value in 200..299) {
                 Effect(true, response)
-            }else {
+            } else {
                 Effect(false, error = Exception(response.message ?: "Something went wrong"))
             }
         } catch (e: Exception) {
@@ -86,6 +91,9 @@ class ChatApiRepositoryImpl(
                     headers["contact"] = chatId
                 }
             val response = request.body<GetChatResponse>()
+            response.chats.forEach {
+                println(it.message)
+            }
             return if (request.status.value in 200..299) {
                 Effect(true, response)
             } else {
@@ -116,6 +124,60 @@ class ChatApiRepositoryImpl(
             val response = request.body<SendMessageResponse>()
             return if (request.status.value in 200..299) {
                 Effect(true, response)
+            } else {
+                Effect(false, error = Exception(response.message ?: "Something went wrong"))
+            }
+        } catch (e: Exception) {
+            return Effect(false, error = e)
+        }
+    }
+
+    override suspend fun wipeChats(): Effect<Unit> {
+        //   TODO("Not yet implemented")
+        try {
+            val request =
+                httpClient.get(url = Url("https://ton-decentralized-chat.vercel.app/api/chat/wipeChats")) {
+                    secureStorageRepository.getToken().onSuccess {
+                        headers["token"] = it
+                    }.onFailure { e ->
+                        return Effect(false, error = Exception(e.message))
+                    }
+                    secureStorageRepository.getUserFriendlyAddress().onSuccess {
+                        headers["address"] = it
+                    }.onFailure { e ->
+                        return Effect(false, error = Exception(e.message))
+                    }
+                }
+            val response = request.body<GenericMessageResponse>()
+            return if (request.status.value in 200..299) {
+                Effect(true, Unit)
+            } else {
+                Effect(false, error = Exception(response.message ?: "Something went wrong"))
+            }
+        } catch (e: Exception) {
+            return Effect(false, error = e)
+        }
+    }
+
+    override suspend fun deleteChat(): Effect<Unit> {
+        //   TODO("Not yet implemented")
+        try {
+            val request =
+                httpClient.get(url = Url("https://ton-decentralized-chat.vercel.app/api/chat/deleteChat")) {
+                    secureStorageRepository.getToken().onSuccess {
+                        headers["token"] = it
+                    }.onFailure { e ->
+                        return Effect(false, error = Exception(e.message))
+                    }
+                    secureStorageRepository.getUserFriendlyAddress().onSuccess {
+                        headers["address"] = it
+                    }.onFailure { e ->
+                        return Effect(false, error = Exception(e.message))
+                    }
+                }
+            val response = request.body<GenericMessageResponse>()
+            return if (request.status.value in 200..299) {
+                Effect(true, Unit)
             } else {
                 Effect(false, error = Exception(response.message ?: "Something went wrong"))
             }

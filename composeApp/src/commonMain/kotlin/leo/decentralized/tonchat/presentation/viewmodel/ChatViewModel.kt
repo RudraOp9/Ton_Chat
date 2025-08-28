@@ -18,15 +18,18 @@ class ChatViewModel(
 
     fun getChats(contactAddress: String, contactPublicKey: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            chatUseCase.getChatFor(contactAddress = contactAddress, contactPublicKey = contactPublicKey,{
-                it.onSuccess {chat ->
+            chatUseCase.getChatFor(contactAddress = contactAddress, contactPublicKey = contactPublicKey) { it1 ->
+                it1.onSuccess { chat ->
+                    println(
+                        chat.message
+                    )
                     chatList.value = chatList.value.toMutableList().apply {
-                        add(0,chat)
+                        add(0, chat)
                     }
                 }.onFailure {
                     snackBarText.value = it.message ?: "Unknown error"
                 }
-            }).onSuccess {
+            }.onSuccess {
                 // todo paging
                 shimmer.value = false
             }.onFailure {

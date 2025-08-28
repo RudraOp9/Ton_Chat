@@ -43,8 +43,10 @@ class ChatUseCase(
                                 contactAddress,
                                 contactPublicKey
                             ).onSuccess {
+                                println("Success decrypting : $it")
                                 onNewMessage(Result.success(ChatMessage(it,mapEntry.by == myAddress)))
                             }.onFailure {
+                                println(it.message?:"Failure decrypting")
                                 onNewMessage(Result.failure(it))
                             }
                         }
@@ -73,5 +75,23 @@ class ChatUseCase(
         } else {
             Result.failure(result.error ?: Exception("Unknown error"))
         }
+    }
+
+    suspend fun wipeChats():Result<Unit>{
+        val result = chatApi.wipeChats()
+        return if (result.success) {
+            Result.success(Unit)
+        } else {
+            Result.failure(result.error ?: Exception("Unknown error"))
+        }
+    }
+
+     suspend fun deleteAccount():Result<Unit>{
+         val result = chatApi.deleteChat()
+         return if (result.success) {
+             Result.success(Unit)
+         } else {
+             Result.failure(result.error ?: Exception("Unknown error"))
+         }
     }
 }

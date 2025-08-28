@@ -19,8 +19,10 @@ import leo.decentralized.tonchat.presentation.viewmodel.HomeViewModel
 import leo.decentralized.tonchat.presentation.viewmodel.ImportWalletViewModel
 import leo.decentralized.tonchat.presentation.viewmodel.InputPasswordViewModel
 import leo.decentralized.tonchat.presentation.viewmodel.NewWalletViewModel
-import leo.decentralized.tonchat.presentation.viewmodel.SettingsViewModel
+import leo.decentralized.tonchat.presentation.viewmodel.settings.SettingsViewModel
 import leo.decentralized.tonchat.presentation.viewmodel.SplashScreenViewModel
+import leo.decentralized.tonchat.presentation.viewmodel.settings.AboutSettingsViewModel
+import leo.decentralized.tonchat.presentation.viewmodel.settings.AccountManageSettingsViewModel
 import leo.decentralized.tonchat.utils.networking.createHttpClient
 import leo.decentralized.tonchat.utils.networking.httpClientEngine
 import org.koin.core.module.dsl.viewModel
@@ -36,6 +38,9 @@ val commonModule = module {
     viewModel { SplashScreenViewModel(get()) }
     viewModel { ChatViewModel(get()) }
     viewModel { SettingsViewModel(get()) }
+
+    viewModel { AccountManageSettingsViewModel(get(),get(),get()) }
+    viewModel { AboutSettingsViewModel(get()) }
 
     //use cases
     factory { TonWalletUseCase(get(),get()) }

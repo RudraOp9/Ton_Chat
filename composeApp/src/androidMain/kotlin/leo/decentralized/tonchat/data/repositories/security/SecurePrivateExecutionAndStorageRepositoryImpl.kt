@@ -72,6 +72,15 @@ class SecurePrivateExecutionAndStorageRepositoryImpl(
 
     }
 
+    private fun removeAllContactKeys(){
+        val keyStore = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
+        keyStore.aliases().toList().forEach {
+            if (it.contains("-chat")){
+                keyStore.deleteEntry(it)
+            }
+        }
+    }
+
     @Deprecated("Can't save ed25519 in keystore")
     @Override
     override suspend fun storePrivateKey(
@@ -166,9 +175,12 @@ class SecurePrivateExecutionAndStorageRepositoryImpl(
         try {
             val key = getContactKey(contactAddress,hex(contactPublicKey))
             val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-            cipher.init(Cipher.ENCRYPT_MODE,key)
+            cipher.init(Cipher.ENCRYPT_MODE, key)
             val encryptedMessage  = cipher.doFinal(message.toByteArray())
-            return Result.success("${hex(encryptedMessage)}:${hex(cipher.iv)}")
+            println("tag length ${cipher.parameters.getParameterSpec(GCMParameterSpec::class.java).tLen}")
+            return Result.success(
+                "${hex(encryptedMessage)}:${hex(cipher.iv)}:${cipher.parameters.getParameterSpec(GCMParameterSpec::class.java).tLen}"
+            )
         }catch (e: Exception){
             return Result.failure(e)
         }
@@ -182,7 +194,7 @@ class SecurePrivateExecutionAndStorageRepositoryImpl(
         val key = getContactKey(contactAddress,hex(contactPublicKey))
         val cipher = Cipher.getInstance("AES/GCM/NoPadding")
         cipher.init(Cipher.DECRYPT_MODE, key,
-        GCMParameterSpec(128, hex(encryptedMessage.split(":")[1])))
+        GCMParameterSpec(encryptedMessage.split(":")[2].toInt(), hex(encryptedMessage.split(":")[1])))
         return Result.success(cipher.doFinal(hex(encryptedMessage.split(":")[0])).decodeToString())
     }
 

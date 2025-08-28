@@ -42,7 +42,7 @@ import androidx.navigation.compose.rememberNavController
 import leo.decentralized.tonchat.presentation.navigation.Screens
 import leo.decentralized.tonchat.presentation.screens.DefaultScreen
 import leo.decentralized.tonchat.presentation.theme.TonDecentralizedChatTheme
-import leo.decentralized.tonchat.presentation.viewmodel.SettingsViewModel
+import leo.decentralized.tonchat.presentation.viewmodel.settings.SettingsViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 
