@@ -24,7 +24,7 @@ class ChatViewModel(
                         chat.message
                     )
                     chatList.value = chatList.value.toMutableList().apply {
-                        add(0, chat)
+                        add(chat)
                     }
                 }.onFailure {
                     snackBarText.value = it.message ?: "Unknown error"
@@ -33,6 +33,7 @@ class ChatViewModel(
                 // todo paging
                 shimmer.value = false
             }.onFailure {
+                it.printStackTrace()
                 snackBarText.value = it.message ?: "Unknown error"
                 shimmer.value = false
             }

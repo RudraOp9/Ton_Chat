@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Shape
@@ -25,12 +26,17 @@ fun Modifier.shimmerBackground(shape: Shape = RoundedCornerShape(0.dp)): Modifie
             repeatMode = RepeatMode.Restart
         ), label = "shimmerTranslate"
     )
-    background(
-        brush = Brush.linearGradient(
-            colors = listOf(MaterialTheme.colorScheme.surface, MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.colorScheme.surface),
-            start = Offset(translateAnimation.value - 500f, translateAnimation.value - 500f),
-            end = Offset(translateAnimation.value, translateAnimation.value)
-        ),
-        shape = shape
-    )
+    val colors = listOf(
+        MaterialTheme.colorScheme.surface,
+        MaterialTheme.colorScheme.surfaceVariant,
+        MaterialTheme.colorScheme.surface)
+    drawBehind {
+        drawRect(
+            brush = Brush.linearGradient(
+                colors = colors,
+                start = Offset(translateAnimation.value - 500f, translateAnimation.value - 500f),
+                end = Offset(translateAnimation.value, translateAnimation.value)
+            )
+        )
+    }
 }

@@ -10,10 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
+import leo.decentralized.tonchat.presentation.screens.DefaultScreen
 
 @Composable
 fun PrivacyAndSecuritySettingsScreen(onBackClick: () -> Unit) {
-    _root_ide_package_.leo.decentralized.tonchat.presentation.screens.DefaultScreen(
+    DefaultScreen(
         screenName = "Privacy & Security",
         primaryButtonIcon = Icons.AutoMirrored.Default.ArrowBack,
         onPrimaryClick = {

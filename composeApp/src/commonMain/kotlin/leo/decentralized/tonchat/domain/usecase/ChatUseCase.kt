@@ -1,6 +1,7 @@
 package leo.decentralized.tonchat.domain.usecase
 
 import leo.decentralized.tonchat.data.dataModels.Contact
+import leo.decentralized.tonchat.data.dataModels.GetContactsResponse
 import leo.decentralized.tonchat.data.repositories.network.chatApi.ChatApiRepository
 import leo.decentralized.tonchat.data.repositories.security.SecurePrivateExecutionAndStorageRepository
 import leo.decentralized.tonchat.data.repositories.security.SecureStorageRepository
@@ -11,10 +12,10 @@ class ChatUseCase(
     private val secureStorage: SecureStorageRepository,
     private val securePrivateExecutionAndStorage: SecurePrivateExecutionAndStorageRepository,
 ) {
-    suspend fun getContacts(): Result<List<Contact>> {
+    suspend fun getContacts(): Result<GetContactsResponse> {
         val result = chatApi.getContacts()
         return if (result.success) {
-            Result.success(result.result?.contacts.orEmpty())
+            Result.success(result.result!!)
         } else {
             Result.failure(result.error ?: Exception("Unknown error"))
         }
@@ -34,21 +35,18 @@ class ChatUseCase(
             val result = chatApi.getChatFor(contactAddress)
             val myAddress = secureStorage.getUserFriendlyAddress().getOrThrow()
             if (result.success) {
-                val listOfChats: MutableList<ChatMessage> = mutableListOf()
-                listOfChats.apply {
-                    result.result?.chats?.let { chats ->
-                        chats.forEach { mapEntry ->
-                            securePrivateExecutionAndStorage.decryptMessage(
-                                mapEntry.message,
-                                contactAddress,
-                                contactPublicKey
-                            ).onSuccess {
-                                println("Success decrypting : $it")
-                                onNewMessage(Result.success(ChatMessage(it,mapEntry.by == myAddress)))
-                            }.onFailure {
-                                println(it.message?:"Failure decrypting")
-                                onNewMessage(Result.failure(it))
-                            }
+                result.result?.chats?.let { chats ->
+                    chats.forEach { mapEntry ->
+                        securePrivateExecutionAndStorage.decryptMessage(
+                            mapEntry.message,
+                            contactAddress,
+                            contactPublicKey
+                        ).onSuccess {
+                            println("Success decrypting : $it")
+                            onNewMessage(Result.success(ChatMessage(it, mapEntry.by == myAddress)))
+                        }.onFailure {
+                            println(it.message ?: "Failure decrypting")
+                            onNewMessage(Result.failure(it))
                         }
                     }
                 }
@@ -57,6 +55,7 @@ class ChatUseCase(
                 return Result.failure(result.error ?: Exception("Unknown error"))
             }
         } catch (e: Exception) {
+            println("eror : "+e.message ?: "Error getting chat")
             return Result.failure(e)
         }
     }

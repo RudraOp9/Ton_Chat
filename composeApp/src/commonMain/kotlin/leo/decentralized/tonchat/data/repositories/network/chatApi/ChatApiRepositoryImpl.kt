@@ -33,10 +33,6 @@ class ChatApiRepositoryImpl(
                 }
             val response = request.body<GetContactsResponse>()
 
-            response.contacts?.forEach {
-                println(it.address)
-            }
-
             return if (request.status.value in 200..299) {
                 Effect(true, response)
             } else {

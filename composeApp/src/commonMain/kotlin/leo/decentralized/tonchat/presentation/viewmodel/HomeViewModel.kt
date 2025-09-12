@@ -18,6 +18,7 @@ class HomeViewModel(
     private val password: Password
 ): ViewModel() {
     var contacts = mutableStateOf<List<Contact>>(emptyList())
+    var spamContact = mutableStateOf<List<Contact>>(emptyList())
     var newContactScreen = mutableStateOf(false)
 
     val isLoadingText = mutableStateOf("")
@@ -30,7 +31,8 @@ class HomeViewModel(
                 println("Contacts: $it")
                 isLoading.value = false
                 isContactsLoading.value = false
-                contacts.value = it
+                contacts.value = it.contacts?: emptyList()
+                spamContact.value = it.spamContacts?: emptyList()
             }.onFailure {
                 isLoading.value = false
                 isContactsLoading.value = false
@@ -55,7 +57,8 @@ class HomeViewModel(
                     newContactScreen.value = false
                     isContactsLoading.value = true
                     chatUseCase.getContacts().onSuccess {contact ->
-                        contacts.value = contact
+                        contacts.value = contact.contacts?: emptyList()
+                        spamContact.value = contact.spamContacts?: emptyList()
                         isLoading.value = false
                         isContactsLoading.value = false
                     }.onFailure {

@@ -14,4 +14,5 @@ interface SecurePrivateExecutionAndStorageRepository {
     fun encryptMessage(message: String,contactAddress: String, contactPublicKey: String): Result<String>
     fun decryptMessage(encryptedMessage: String,contactAddress: String, contactPublicKey: String): Result<String>
     fun generateSharedKey(contactPublicKey: ByteArray): Result<ByteArray>
+    fun removeSharedKeys(): Result<Unit>
 }

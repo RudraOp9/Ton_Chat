@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import leo.decentralized.tonchat.data.repositories.security.SecurePrivateExecutionAndStorageRepository
 import leo.decentralized.tonchat.data.repositories.security.SecureStorageRepository
 import leo.decentralized.tonchat.domain.usecase.ChatUseCase
+import kotlin.math.log
 
 class AccountManageSettingsViewModel(
     private val secureStorageRepository: SecureStorageRepository,
@@ -29,17 +30,21 @@ class AccountManageSettingsViewModel(
             val deletePrivateKeyJob = async { secureStorageRepository.deletePrivateKey() }
             val deleteUserFriendlyAddressJob = async { secureStorageRepository.deleteUserFriendlyAddress() }
             val setLoggedInJob = async { secureStorageRepository.setLoggedIn(false) }
-            listOf(deleteTokenJob, deletePublicKeyJob, deletePrivateKeyJob, deleteUserFriendlyAddressJob, setLoggedInJob).forEach {
+            val deleteSharedKeysJob = async { securePrivateExecutionAndStorageRepository.removeSharedKeys() }
+            listOf(deleteTokenJob, deletePublicKeyJob, deletePrivateKeyJob, deleteUserFriendlyAddressJob, setLoggedInJob,deleteSharedKeysJob).forEach {
                 it.await() }
+            //todo what about password ?
             viewModelScope.launch(Dispatchers.Main){
                 restartApp()
             }
         }
     }
 
-    fun deleteAccount(){
+    fun deleteAccount(restartApp:()->Unit){
         viewModelScope.launch(Dispatchers.IO){
-            chatUseCase.deleteAccount().onSuccess {  }.onFailure {  }
+            chatUseCase.deleteAccount().onSuccess {
+                logout(restartApp)
+            }.onFailure {  }
         }
     }
 

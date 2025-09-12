@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
@@ -26,20 +27,33 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.sharp.Search
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.semantics.Role
@@ -51,6 +65,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import kotlinx.coroutines.coroutineScope
 import leo.decentralized.tonchat.presentation.navigation.Screen
 import leo.decentralized.tonchat.presentation.navigation.Screens
 import leo.decentralized.tonchat.presentation.screens.DefaultScreen
@@ -64,6 +79,16 @@ fun HomeScreen(navController: NavController,vm: HomeViewModel = koinViewModel())
 
     val snackBarHost = remember{
         SnackbarHostState()
+    }
+
+    var crrPage by rememberSaveable{
+        mutableStateOf(0)
+    }
+
+    val pagerState = rememberPagerState { 2 }
+
+    LaunchedEffect(pagerState.currentPage){
+        crrPage = pagerState.currentPage
     }
 
     LaunchedEffect(Unit){
@@ -83,6 +108,7 @@ fun HomeScreen(navController: NavController,vm: HomeViewModel = koinViewModel())
         snackbarHostState = snackBarHost
     ) {
         DefaultScreen(
+            modifier = Modifier.fillMaxSize(),
             screenName = "Decentralized ton chat",
             onPrimaryClick = {},
             primaryButtonIcon = Icons.Sharp.Search,
@@ -108,39 +134,125 @@ fun HomeScreen(navController: NavController,vm: HomeViewModel = koinViewModel())
                     HorizontalPager(
                         modifier = Modifier.padding(top = 4.dp)
                             .navigationBarsPadding(),
-                        state = rememberPagerState { 2 },
+                        state = pagerState,
                         beyondViewportPageCount = 1,
-                        userScrollEnabled = false,
+                        userScrollEnabled = true,
                         //key = {it},
-                        pageContent = {
+                        pageContent = { page ->
                             LazyColumn(
-                                modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainerLow)
+                                modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceContainerLow)
                             ) {
                                 if (vm.isContactsLoading.value) {
                                     items(4) {
                                         ChatItemShimmer()
                                     }
                                 }
+                                if (!vm.isContactsLoading.value && if (page==0) vm.contacts.value.isEmpty() else vm.spamContact.value.isEmpty()) {
+                                    item {
 
-                                items(vm.contacts.value) {
+                                        Column(
+                                            modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                            horizontalAlignment = Alignment.CenterHorizontally,
+                                            verticalArrangement = Arrangement.Center
+                                        ) {
+                                            if (page == 0) {
+                                                Text(
+                                                    text = "No contacts yet",
+                                                    style = MaterialTheme.typography.headlineSmall,
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                )
+                                                Spacer(modifier = Modifier.padding(8.dp))
+                                                Text(
+                                                    text = "Click the button below to add a new contact.",
+                                                    style = MaterialTheme.typography.bodyLarge,
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                    textAlign = TextAlign.Center
+                                                )
+                                                Spacer(modifier = Modifier.padding(16.dp))
+                                                val infiniteTransition =
+                                                    rememberInfiniteTransition(label = "arrowTransition")
+                                                val arrowOffsetY = infiniteTransition.animateFloat(
+                                                    initialValue = 0f,
+                                                    targetValue = 20f,
+                                                    animationSpec = infiniteRepeatable(
+                                                        animation = tween(1000),
+                                                        repeatMode = RepeatMode.Reverse
+                                                    ), label = "arrowOffsetY"
+                                                )
+                                                Icon(
+                                                    Icons.Default.ArrowDownward,
+                                                    contentDescription = "Add new contact hint",
+                                                    tint = MaterialTheme.colorScheme.primary,
+                                                    modifier = Modifier
+                                                        .rotate(-20f)
+                                                        .size(48.dp)
+                                                        .graphicsLayer {
+                                                            translationY = arrowOffsetY.value
+                                                        }
+                                                )
+                                            }else{
+                                                Text(
+                                                    text = "Spam is empty",
+                                                    style = MaterialTheme.typography.headlineSmall,
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                )
+                                                Spacer(modifier = Modifier.padding(8.dp))
+                                                Text(
+                                                    text = "This will be updated once someone tries to contact you.",
+                                                    style = MaterialTheme.typography.bodyLarge,
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                    textAlign = TextAlign.Center
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+
+                                items(if (page==0)vm.contacts.value else vm.spamContact.value) {
                                     ChatItem(
                                         it.address,
                                         ChatStatus.UNKNOWN,
                                         unreadCount = 0
-                                    ) { //TODO
+                                    ) { //TODO ?
                                         navController.navigate(Screen.ChatScreen(it.address,it.publicKey))
                                     }
                                 }
                             }
                         }
                     )
+
+                    TabRow(
+                        selectedTabIndex = crrPage,
+                        modifier = Modifier.align { s, i, l ->
+                                Alignment.BottomEnd.align(s, i, l)
+                            }.navigationBarsPadding(),
+                        indicator = {}
+                    ) {
+                        Tab(
+                            selected = crrPage == 0,
+                            onClick = {
+                                pagerState.requestScrollToPage(0)
+                            },
+                            text = { Text("Chats") },
+                            unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Tab(
+                            selected = crrPage == 1,
+                            onClick = {
+                                pagerState.requestScrollToPage(1)
+                            },
+                            text = { Text("Spam") },
+                            unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+
                     SmallFloatingActionButton(
                         onClick = {
                             vm.newContactScreen.value = true
                         },
                         modifier = Modifier.align { s, i, l ->
                             Alignment.BottomEnd.align(s, i, l)
-                        }.padding(end = 8.dp, bottom = 16.dp).navigationBarsPadding(),
+                        }.padding(end = 8.dp).navigationBarsPadding(),
                         shape = CircleShape
                     ) {
                         Icon(Icons.Default.Add, "New contact")

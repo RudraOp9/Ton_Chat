@@ -9,7 +9,9 @@ data class GetContactsResponse(
     @SerialName("contacts")
     val contacts: List<Contact>? = null,
     @SerialName("message")
-    val message: String? = null
+    val message: String? = null,
+    @SerialName("spamContacts")
+    val spamContacts: List<Contact>? = null
 )
 
 @Serializable

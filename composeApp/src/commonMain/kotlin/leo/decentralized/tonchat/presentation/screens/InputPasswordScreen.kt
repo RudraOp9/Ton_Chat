@@ -1,9 +1,13 @@
 package leo.decentralized.tonchat.presentation.screens
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.animateColor
+import androidx.compose.animation.core.AnimationState
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateTo
+import androidx.compose.animation.core.rememberTransition
 import androidx.compose.animation.core.repeatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -14,13 +18,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Backspace
@@ -29,6 +32,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
@@ -58,6 +63,7 @@ fun InputPasswordScreen(navHost: NavHostController, isNew: Boolean, goTo: String
     var isConfirming by rememberSaveable { mutableStateOf(false) }
     var isError by rememberSaveable { mutableStateOf(false) }
     val vm: InputPasswordViewModel = koinViewModel()
+    val enteredPin by vm.enteredPin.collectAsState()
 
     val onErrorFinishedCallback = remember {
         {
@@ -66,23 +72,23 @@ fun InputPasswordScreen(navHost: NavHostController, isNew: Boolean, goTo: String
     }
     val onNumberClickCallback = remember {
         { number:Int ->
-            if (vm.enteredPin.value.length < 4) {
-                vm.enteredPin.value += number
+            if (enteredPin.length < 4) {
+                vm.changePin(number)
             }
         }
     }
     val onBackspaceClickCallback = remember {
         {
-            if (vm.enteredPin.value.isNotEmpty()) {
-                vm.enteredPin.value = vm.enteredPin.value.dropLast(1)
+            if (enteredPin.isNotEmpty()) {
+                vm.backspace()
             }
         }
     }
 
-    LaunchedEffect(vm.enteredPin.value){
-        if (vm.enteredPin.value.length == 4) {
+    LaunchedEffect(enteredPin){
+        if (enteredPin.length == 4) {
             delay(100) // let the animation finish
-            val pinString = vm.enteredPin.value
+            val pinString = enteredPin
             if (isNew) {
                 if (isConfirming) {
                     if (pinString == firstPin) {
@@ -100,19 +106,19 @@ fun InputPasswordScreen(navHost: NavHostController, isNew: Boolean, goTo: String
                     } else {
                         isError = true
                         println("PINs do not match. Try again.")
-                        vm.enteredPin.value = ""
+                        vm.clearPin()
                     }
                 } else {
                     firstPin = pinString
                     isConfirming = true
-                    vm.enteredPin.value = ""
+                    vm.clearPin()
                 }
             } else {
                 //validate pin todo : max attempts
                 vm.savePassword()
                 vm.checkPassAndContinue()
                     .onSuccess { // Example: incorrect PIN
-                        vm.enteredPin.value = ""
+                        vm.clearPin()
                         firstPin = ""
                         navHost.navigate(goTo) {
                             popUpTo(Screen.PassCode(isNew, goTo)) {
@@ -120,7 +126,7 @@ fun InputPasswordScreen(navHost: NavHostController, isNew: Boolean, goTo: String
                             }
                         }
                     }.onFailure {
-                        vm.enteredPin.value = ""
+                        vm.clearPin()
                         isError = true
                     }
             }
@@ -153,7 +159,7 @@ fun InputPasswordScreen(navHost: NavHostController, isNew: Boolean, goTo: String
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(modifier = Modifier.height(40.dp))
-            PinDots(enteredLength = vm.enteredPin.value.count(), isError = isError,onErrorFinishedCallback)
+            PinDots(enteredLength = enteredPin.length, isError = isError,onErrorFinishedCallback)
         }
         NumericKeyboard(
             onNumberClick = onNumberClickCallback,
@@ -164,54 +170,42 @@ fun InputPasswordScreen(navHost: NavHostController, isNew: Boolean, goTo: String
 
 @Composable
 fun PinDots(enteredLength: Int, isError: Boolean, onErrorFinished: () -> Unit) {
-    val scope = rememberCoroutineScope()
-    val shakeOffset = remember { Animatable(0f) }
-    val length = rememberUpdatedState(enteredLength)
-    val error = rememberUpdatedState(isError)
-
-    LaunchedEffect(error.value) {
-        if (error.value) {
-            scope.launch {
-                shakeOffset.animateTo(
-                    targetValue = 20f,
-                    animationSpec = repeatable(
-                        iterations = 3,
-                        animation = tween(durationMillis = 50, easing = LinearEasing),
-                        repeatMode = RepeatMode.Reverse
-                    )
-                )
-                shakeOffset.animateTo(0f, animationSpec = tween(durationMillis = 50))
-                onErrorFinished()
-            }
+    val shakeOffset = animateFloatAsState(
+        if (isError)20f else 0f,
+        animationSpec = repeatable(iterations = 3, animation = tween(easing = LinearEasing, durationMillis = 50), repeatMode = RepeatMode.Reverse),
+        finishedListener = {
+            onErrorFinished()
         }
-    }
+    )
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.offset{
-            IntOffset(x = shakeOffset.value.toInt(),y = 0)
-        } // Apply shake animation
+        modifier = Modifier.graphicsLayer {
+            this.translationX = shakeOffset.value
+        },
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(count = 4, key = { it }) {index ->
-                val dotColor = animateColorAsState(
-                    targetValue = if (error.value) MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.8f)
-                    else if (index < length.value) MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
-                    else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f),
-                    animationSpec = tween(durationMillis = if (error.value) 0 else 200),
-                    label = "dot color" // Faster color change on error
+        repeat(4) { index ->
+            val dotColor = rememberTransition(
+                MutableTransitionState(
+                    MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f)
+                ), ""
+            )
+            val anim = dotColor.animateColor {
+                if (isError) MaterialTheme.colorScheme.errorContainer.copy(
+                    alpha = 0.8f
                 )
-                Box(
-                    modifier = Modifier
-                        .size(16.dp)
-                        .clip(CircleShape)
-                        .drawBehind {
-                            drawRect(dotColor.value)
-                        }
-                )
+                else if (index < enteredLength) MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f)
             }
+            Box(
+                modifier = Modifier
+                    .size(16.dp)
+                    .clip(CircleShape)
+                    .drawBehind {
+                        drawRect(anim.value)
+                    }
+            )
         }
 
     }
@@ -236,7 +230,7 @@ fun NumericKeyboard(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        buttons.forEach { row ->
+        buttons.forEach {  row ->
             Row(
                 modifier = Modifier,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)

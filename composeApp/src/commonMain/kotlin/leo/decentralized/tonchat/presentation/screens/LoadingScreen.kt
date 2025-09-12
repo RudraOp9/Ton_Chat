@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -32,10 +33,16 @@ fun LoadingScreen(
     snackbarHostState: SnackbarHostState,
     content: @Composable () -> Unit
 ) {
-    SnackbarHost(snackbarHostState, modifier = Modifier.imePadding())
+
 
         Box(modifier = Modifier.fillMaxSize()) {
             content()
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
+                SnackbarHost(
+                    snackbarHostState,
+                    modifier = Modifier.imePadding().navigationBarsPadding()
+                )
+            }
             if (isLoading) {
                 Box(
                     modifier = Modifier.fillMaxSize()

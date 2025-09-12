@@ -210,6 +210,16 @@ class SecurePrivateExecutionAndStorageRepositoryImpl(
         }
     }
 
+    override fun removeSharedKeys(): Result<Unit> {
+        try {
+            removeAllContactKeys().apply {
+                return Result.success(Unit)
+            }
+        }catch (e: Exception){
+            return Result.failure(e)
+        }
+    }
+
     companion object {
         private const val ALGORITHM: String = "Ed25519" // Using Ed25519 for signing
 
