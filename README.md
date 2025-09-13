@@ -25,13 +25,16 @@ Flow :
 2. Authentication with server :  Sign Challenge code with Private key which will be verified by server for Token.
 code could be : { address:UserFriendlyAddress, timestamp: Local_Time }
 
-3. Chat Exchange : 
-                      First Ed25519 has to be converted to XC25519
-                      User1 and User2 will share their public Keys
-                      User1 PrivateKey + User2 PublicKey = Shared Key
-                      SharedKey -> AES Key -> KeyStore/Secure enclave
-                      Shared Key will be same for both users
-                      Chats can be decrypted/encrypted with this AES key
+3. Chat Exchange :
 
+    First Ed25519 has to be converted to XC25519
 
+    User1 and User2 will share their public Keys
+    
+    User1 PrivateKey + User2 PublicKey = Shared Key
+     
+    SharedKey -> AES Key -> KeyStore/Secure enclave
 
+    Shared Key will be same for both users
+
+    Chats can be decrypted/encrypted with this AES key
