@@ -28,7 +28,6 @@ class HomeViewModel(
     init {
         viewModelScope.launch(Dispatchers.IO){
             chatUseCase.getContacts().onSuccess {
-                println("Contacts: $it")
                 isLoading.value = false
                 isContactsLoading.value = false
                 contacts.value = it.contacts?: emptyList()

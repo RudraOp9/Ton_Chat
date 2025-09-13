@@ -87,9 +87,6 @@ class ChatApiRepositoryImpl(
                     headers["contact"] = chatId
                 }
             val response = request.body<GetChatResponse>()
-            response.chats.forEach {
-                println(it.message)
-            }
             return if (request.status.value in 200..299) {
                 Effect(true, response)
             } else {

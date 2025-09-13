@@ -20,9 +20,6 @@ class ChatViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             chatUseCase.getChatFor(contactAddress = contactAddress, contactPublicKey = contactPublicKey) { it1 ->
                 it1.onSuccess { chat ->
-                    println(
-                        chat.message
-                    )
                     chatList.value = chatList.value.toMutableList().apply {
                         add(chat)
                     }
@@ -33,7 +30,6 @@ class ChatViewModel(
                 // todo paging
                 shimmer.value = false
             }.onFailure {
-                it.printStackTrace()
                 snackBarText.value = it.message ?: "Unknown error"
                 shimmer.value = false
             }
@@ -53,7 +49,6 @@ class ChatViewModel(
                 }
             }.onFailure {
                 //todo handle add failure icon
-                it.printStackTrace()
             }
         }
     }

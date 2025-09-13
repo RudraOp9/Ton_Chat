@@ -64,28 +64,6 @@ fun InformationSettingsScreen(onBackClick: () -> Unit) {
                     //todo
                 }.clip(RoundedCornerShape(12))
             )
-
-            ListItem(
-                headlineContent = {
-                    Text(
-                        text = "Logged data"
-                    )
-                },
-                supportingContent = {
-                    Text(
-                        text = "Your stored data"
-                    )
-                },
-                trailingContent = {},
-                //  colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
-                modifier = Modifier.clickable(
-                    interactionSource = null,
-                    indication = null,
-                    role = Role.Button
-                ) {
-                    //todo
-                }.clip(RoundedCornerShape(12))
-            )
         }
     }
 }

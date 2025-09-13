@@ -64,7 +64,6 @@ class SecureStorageRepositoryImpl(
                 if (it == null) return Result.failure(Exception("privateKey not found"))
                 val result = passwordEncryptionRepository.decrypt(it)
                 if (!result.success) throw result.error!!
-                println("private key :${result.result!!}")
                 return Result.success(hex(result.result!!))
             }
         }catch (e: Exception){

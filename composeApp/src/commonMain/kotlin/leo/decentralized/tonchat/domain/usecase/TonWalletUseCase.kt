@@ -78,7 +78,6 @@ class TonWalletUseCase(
     ): Effect<String> {
         try {
             val publicKey = secureStorage.getPublicKey().getOrThrow().toHexString()
-            println("request : $publicKey $address $signature")
             val result = tonChatApi.generateToken(
                 publicKey = publicKey,
                 address = address,

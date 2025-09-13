@@ -8,7 +8,6 @@ class SettingsViewModel(private val secureStorageRepository: SecureStorageReposi
         secureStorageRepository.setTheme(theme).onSuccess {
             secureStorageRepository.refreshTheme()
         }.onFailure {
-            it.printStackTrace()
         }
     }
 }

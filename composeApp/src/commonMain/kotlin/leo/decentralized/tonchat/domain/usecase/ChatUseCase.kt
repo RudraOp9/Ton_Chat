@@ -3,6 +3,7 @@ package leo.decentralized.tonchat.domain.usecase
 import leo.decentralized.tonchat.data.dataModels.Contact
 import leo.decentralized.tonchat.data.dataModels.GetContactsResponse
 import leo.decentralized.tonchat.data.repositories.network.chatApi.ChatApiRepository
+import leo.decentralized.tonchat.data.repositories.network.userApi.UserApiRepository
 import leo.decentralized.tonchat.data.repositories.security.SecurePrivateExecutionAndStorageRepository
 import leo.decentralized.tonchat.data.repositories.security.SecureStorageRepository
 import leo.decentralized.tonchat.presentation.screens.ChatMessage
@@ -42,10 +43,8 @@ class ChatUseCase(
                             contactAddress,
                             contactPublicKey
                         ).onSuccess {
-                            println("Success decrypting : $it")
                             onNewMessage(Result.success(ChatMessage(it, mapEntry.by == myAddress)))
                         }.onFailure {
-                            println(it.message ?: "Failure decrypting")
                             onNewMessage(Result.failure(it))
                         }
                     }
@@ -55,7 +54,6 @@ class ChatUseCase(
                 return Result.failure(result.error ?: Exception("Unknown error"))
             }
         } catch (e: Exception) {
-            println("eror : "+e.message ?: "Error getting chat")
             return Result.failure(e)
         }
     }

@@ -21,8 +21,6 @@ class TonChatApiRepositoryImpl(
                     headers["key"] = publicKey
                 }
             val response = request.body<GetV4R2Address>()
-            print(request.bodyAsText())
-            println(response.toString())
             return Effect(true, response.address)
         } catch (e: Exception) {
             return Effect(false, error = e)
@@ -42,8 +40,6 @@ class TonChatApiRepositoryImpl(
                     headers["signature"] = signature
                 }
             val response = request.body<GenToken>()
-            print(request.bodyAsText())
-            println(response.toString())
 
             return if (request.status.value in 200..299) {
                 Effect(true, response)

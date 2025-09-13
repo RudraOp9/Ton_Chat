@@ -105,7 +105,6 @@ fun InputPasswordScreen(navHost: NavHostController, isNew: Boolean, goTo: String
 
                     } else {
                         isError = true
-                        println("PINs do not match. Try again.")
                         vm.clearPin()
                     }
                 } else {

@@ -43,4 +43,8 @@ class UserUseCase(
             Effect(false, error = response.error?: Exception("Something went wrong"))
         }
     }
+
+    suspend fun deleteAccount(): Result<Unit> {
+        return userApiRepository.deleteAccount()
+    }
 }

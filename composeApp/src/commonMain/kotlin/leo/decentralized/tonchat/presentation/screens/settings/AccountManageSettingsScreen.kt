@@ -14,10 +14,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
 import leo.decentralized.tonchat.presentation.screens.DefaultScreen
 import leo.decentralized.tonchat.presentation.viewmodel.settings.AccountManageSettingsViewModel
+import leo.decentralized.tonchat.utils.BackHandler
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun AccountManageSettingsScreen(onBackClick: (loggedOut: Boolean) -> Unit, vm : AccountManageSettingsViewModel = koinViewModel()) {
+    BackHandler(true){
+        onBackClick(false)
+    }
     DefaultScreen(
         screenName = "Account",
         primaryButtonIcon = Icons.AutoMirrored.Default.ArrowBack,
@@ -65,7 +69,9 @@ fun AccountManageSettingsScreen(onBackClick: (loggedOut: Boolean) -> Unit, vm : 
                     indication = null,
                     role = Role.Button
                 ) {
-
+                    vm.logout {
+                        onBackClick(true)
+                    }
                 }.clip(RoundedCornerShape(12))
             )
 
@@ -112,7 +118,9 @@ fun AccountManageSettingsScreen(onBackClick: (loggedOut: Boolean) -> Unit, vm : 
                     indication = null,
                     role = Role.Button
                 ) {
-                    //todo
+                    vm.deleteAccount {
+                        onBackClick(true)
+                    }
                 }.clip(RoundedCornerShape(12))
             )
         }

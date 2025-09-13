@@ -21,7 +21,6 @@ class SplashScreenViewModel(secureStorageRepository: SecureStorageRepository) : 
         viewModelScope.launch(Dispatchers.IO) {
             secureStorageRepository.refreshTheme()
             secureStorageRepository.getLoggedIn().onSuccess {
-                println("isLoggedIn : $it")
                 if (it) {
                     screen.value = Screens.HomeScreen.screen
                 }else{
@@ -30,7 +29,6 @@ class SplashScreenViewModel(secureStorageRepository: SecureStorageRepository) : 
                 isLoading.value = false
             }.onFailure {
                 isLoading.value = false
-                it.printStackTrace()
             }
         }
     }

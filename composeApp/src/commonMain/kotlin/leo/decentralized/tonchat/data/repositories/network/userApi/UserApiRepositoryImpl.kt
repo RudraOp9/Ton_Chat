@@ -64,4 +64,25 @@ class UserApiRepositoryImpl(
             return Effect(false, error = e)
         }
     }
+
+    override suspend fun deleteAccount(): Result<Unit> {
+        try {
+            val request =
+                httpClient.get(url = Url("https://ton-decentralized-chat.vercel.app/api/user/checkUserExist")) {
+                    secureStorageRepository.getToken().onSuccess {
+                        headers["token"] = it
+                    }.onFailure { e ->
+                        return Result.failure(Exception(e.message))
+                    }
+                }
+            return if (request.status.value in 200..299) {
+                Result.success(Unit)
+            } else {
+                val response = request.body<GenericMessageResponse>()
+                Result.failure(Exception( response.message?:"Something went wrong"))
+            }
+        } catch (e: Exception) {
+            return Result.failure(e)
+        }
+    }
 }

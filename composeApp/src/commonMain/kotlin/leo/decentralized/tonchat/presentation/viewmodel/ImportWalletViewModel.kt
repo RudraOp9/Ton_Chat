@@ -122,7 +122,6 @@ class ImportWalletViewModel(
                     signedMsg.result.toString()
                 )
                 if (result.success) {
-                    println("token " + result.result)
                     result.result?.let {
                         secureStorageRepository.storeToken(token = it).onSuccess {
                             val existStatus = userUseCase.checkUserExist(userFriendlyAddress)

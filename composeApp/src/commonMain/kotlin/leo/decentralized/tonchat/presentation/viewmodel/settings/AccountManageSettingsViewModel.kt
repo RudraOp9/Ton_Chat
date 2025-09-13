@@ -9,12 +9,14 @@ import kotlinx.coroutines.launch
 import leo.decentralized.tonchat.data.repositories.security.SecurePrivateExecutionAndStorageRepository
 import leo.decentralized.tonchat.data.repositories.security.SecureStorageRepository
 import leo.decentralized.tonchat.domain.usecase.ChatUseCase
+import leo.decentralized.tonchat.domain.usecase.UserUseCase
 import kotlin.math.log
 
 class AccountManageSettingsViewModel(
     private val secureStorageRepository: SecureStorageRepository,
     private val securePrivateExecutionAndStorageRepository: SecurePrivateExecutionAndStorageRepository,
-    private val chatUseCase: ChatUseCase
+    private val chatUseCase: ChatUseCase,
+    private val userUseCase: UserUseCase
 ): ViewModel() {
 
     fun wipeChatsFromServer(){
@@ -42,7 +44,7 @@ class AccountManageSettingsViewModel(
 
     fun deleteAccount(restartApp:()->Unit){
         viewModelScope.launch(Dispatchers.IO){
-            chatUseCase.deleteAccount().onSuccess {
+            userUseCase.deleteAccount().onSuccess {
                 logout(restartApp)
             }.onFailure {  }
         }

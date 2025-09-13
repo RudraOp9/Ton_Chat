@@ -8,12 +8,15 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
 import leo.decentralized.tonchat.presentation.screens.DefaultScreen
+import leo.decentralized.tonchat.presentation.viewmodel.settings.PrivacyAndSecuritySettingsViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun PrivacyAndSecuritySettingsScreen(onBackClick: () -> Unit) {
+fun PrivacyAndSecuritySettingsScreen(vm: PrivacyAndSecuritySettingsViewModel = koinViewModel(),onBackClick: () -> Unit) {
     DefaultScreen(
         screenName = "Privacy & Security",
         primaryButtonIcon = Icons.AutoMirrored.Default.ArrowBack,
@@ -24,12 +27,12 @@ fun PrivacyAndSecuritySettingsScreen(onBackClick: () -> Unit) {
             ListItem(
                 headlineContent = {
                     Text(
-                        text = "Remove Keys"
+                        text = "Remove Private Key"
                     )
                 },
                 supportingContent = {
                     Text(
-                        text = "Wallet keys will be removed from device"
+                        text = "You won't be able to contact new addresses or generate new token"
                     )
                 },
                 trailingContent = {},
@@ -39,7 +42,9 @@ fun PrivacyAndSecuritySettingsScreen(onBackClick: () -> Unit) {
                     indication = null,
                     role = Role.Button
                 ) {
-                    //todo
+                    vm.removePrivateKeys {
+                        onBackClick()
+                    }
                 }.clip(RoundedCornerShape(12))
             )
 
@@ -61,7 +66,9 @@ fun PrivacyAndSecuritySettingsScreen(onBackClick: () -> Unit) {
                     indication = null,
                     role = Role.Button
                 ) {
-                    //todo
+                    vm.renewAccessToken{
+                        onBackClick()
+                    }
                 }.clip(RoundedCornerShape(12))
             )
 
@@ -78,13 +85,14 @@ fun PrivacyAndSecuritySettingsScreen(onBackClick: () -> Unit) {
                 },
                 trailingContent = {},
                 //  colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
-                modifier = Modifier.clickable(
-                    interactionSource = null,
-                    indication = null,
-                    role = Role.Button
-                ) {
-                    //todo
-                }.clip(RoundedCornerShape(12))
+                modifier = Modifier
+                    .alpha(0.5f)
+                    .clickable(
+                        enabled = false,
+                        role = Role.Button
+                    ) {
+                        //todo
+                    }.clip(RoundedCornerShape(12))
             )
         }
     }

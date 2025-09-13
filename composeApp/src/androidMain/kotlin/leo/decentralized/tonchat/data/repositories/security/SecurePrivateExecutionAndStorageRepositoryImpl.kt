@@ -177,7 +177,6 @@ class SecurePrivateExecutionAndStorageRepositoryImpl(
             val cipher = Cipher.getInstance("AES/GCM/NoPadding")
             cipher.init(Cipher.ENCRYPT_MODE, key)
             val encryptedMessage  = cipher.doFinal(message.toByteArray())
-            println("tag length ${cipher.parameters.getParameterSpec(GCMParameterSpec::class.java).tLen}")
             return Result.success(
                 "${hex(encryptedMessage)}:${hex(cipher.iv)}:${cipher.parameters.getParameterSpec(GCMParameterSpec::class.java).tLen}"
             )

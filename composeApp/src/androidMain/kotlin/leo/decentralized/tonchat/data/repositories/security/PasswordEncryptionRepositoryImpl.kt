@@ -29,7 +29,6 @@ class PasswordEncryptionRepositoryImpl(private val password: Password): Password
             val secretKey = generateSecureKey(password.password)
             Effect(true,encryptAES(stringToEncrypt, secretKey.encoded))
         } catch (e: Exception) {
-            e.printStackTrace()
             Effect(false,error = e )
         }
     }
@@ -39,7 +38,6 @@ class PasswordEncryptionRepositoryImpl(private val password: Password): Password
             val secretKey = generateSecureKey(password.password)
             Effect(true,decryptAES(stringToDecrypt, secretKey.encoded))
         } catch (e: Exception) {
-            e.printStackTrace()
             Effect(false,error = e )
         }
     }
